@@ -14,24 +14,24 @@ to use EasyCrypt.
 First Example: Simple Logic
 --------------------------------------------------------------------
 
-[SimpLogic.ec](../master/SimpLogic.ec) contains the proof of a lemma
+[`SimpLogic.ec`](../master/SimpLogic.ec) contains the proof of a lemma
 showing how universal quantification can be expressed in terms
 of existential quantification and negation.
 
 Second Example: Random Assignment
 --------------------------------------------------------------------
 
-[RndEx.ec](../master/RndEx.ec) contains several lemmas concerning
+[`RndEx.ec`](../master/RndEx.ec) contains several lemmas concerning
 two procedures involving random assignments. The first procedure
 returns a randomly chosen boolean, whereas the second returns the
 exclusive or of two randomly chosen booleans. Among other facts,
 it is proved that both procedures are equally likely to return
 true, and equally likely to return false.
 
-Third Example: Random Assignment
+Third Example: Symmetric Encryption from Pseudorandom Functions
 --------------------------------------------------------------------
 
-The subdirectory [encryption](../master/encryption) contains the proof
+The subdirectory [`encryption`](../master/encryption) contains the proof
 of IND-CPA (indistinguishability under chosen plaintext attack)
 security for symmetric encryption built out of a pseudorandom
 function.
