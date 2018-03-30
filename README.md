@@ -21,10 +21,12 @@ of existential quantification and negation.
 Second Example: Random Assignment
 --------------------------------------------------------------------
 
-[RandEx.ec](../master/RandEx.ec) contains several lemmas concerning
+[RndEx.ec](../master/RndEx.ec) contains several lemmas concerning
 two procedures involving random assignments. The first procedure
 returns a randomly chosen boolean, whereas the second returns the
-exclusive or of two randomly chosen booleans.
+exclusive or of two randomly chosen booleans. Among other facts,
+it is proved that both procedures are equally likely to return
+true, and equally likely to return false.
 
 Third Example: Random Assignment
 --------------------------------------------------------------------
