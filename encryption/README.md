@@ -13,7 +13,7 @@ The theory [`PseudoRandFun.ec`](PseudoRandFun.ec)
 defines pseudorandom functions (PRFs) and says what it means
 for a PRF to be secure.
 
-And [`SymEnc-PRF.ec`](SymEnc-PRF.ec`) defines a
+And [`SymEnc-PRF.ec`](SymEnc-PRF.ec) defines a
 concrete symmetric encryption scheme out of a PRF, and then proves the
 IND-CPA security of this scheme, reducing it to the security of the
 PRF.
