@@ -14,7 +14,7 @@ to use EasyCrypt.
 First Example: Simple Logic
 --------------------------------------------------------------------
 
-[SimpLogic.ec](../master/SimpLogic) contains the proof of a lemma
+[SimpLogic.ec](../master/SimpLogic.ec) contains the proof of a lemma
 showing how universal quantification can be expressed in terms
 of existential quantification and negation.
 
@@ -29,6 +29,7 @@ exclusive or of two randomly chosen booleans.
 Third Example: Random Assignment
 --------------------------------------------------------------------
 
-The subdirectory [encryption] contains the proof of IND-CPA
-(indistinguishability under chosen plaintext attack) security for
-symmetric encryption built out of a pseudorandom function.
+The subdirectory [encryption](../master/encryption) contains the proof
+of IND-CPA (indistinguishability under chosen plaintext attack)
+security for symmetric encryption built out of a pseudorandom
+function.
