@@ -5,7 +5,7 @@ This subdirectory contains the proof of IND-CPA (indistinguishability
 under chosen plaintext attack) security for symmetric encryption built
 out of a pseudorandom function.
 
-The theory [`SymEnc.ec`](../master/encryption/SymEnc.ec) gives the
+The theory [`SymEnc.ec`](SymEnc.ec) gives the
 general definition of a symmetric encryption scheme, and says what it
 means for such a scheme to be IND-CPA secure.
 
