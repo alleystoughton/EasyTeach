@@ -13,8 +13,10 @@ The theory [`PseudoRandFun.ec`](PseudoRandFun.ec)
 defines pseudorandom functions (PRFs) and says what it means
 for a PRF to be secure.
 
-And [`SymEnc-PRF.ec`](SymEnc-PRF.ec) defines a
-concrete symmetric encryption scheme out of a PRF, and then proves the
-IND-CPA security of this scheme, reducing it to the security of the
-PRF.
+And [`SymEnc-PRF.ec`](SymEnc-PRF.ec) defines a concrete symmetric
+encryption scheme out of a PRF, and then proves the IND-CPA security
+of this scheme, reducing it to the security of the PRF. This proof
+illustates the use of the sequence of games approach, upto bad
+reasoning, and EasyCrypt's failure event lemma for upper-bounding the
+probability of a failure event holding.
 
