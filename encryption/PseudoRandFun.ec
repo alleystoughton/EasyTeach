@@ -32,11 +32,9 @@ op F : key -> text -> text.  (* PRF *)
 
 module type RF = {
   (* initialization *)
-
   proc * init() : unit
 
   (* application to a text *)
-
   proc f(x : text) : text
 }.
 
@@ -72,24 +70,6 @@ module TRF : RF = {
     return oget mp.[x];
   }
 }.
-
-(*
-lemma TRF_f (x' : text) (mp : (text, text)fmap) :
-  equiv[TRF.f ~ TRF.f :
-        ={x, TRF.mp} /\ x{1} = x' /\ mp = TRF.mp{1} ==>
-        ={res, TRF.mp} /\ mem (dom TRF.mp{1}) x' /\
-        oget TRF.mp{1}.[x'] = res{1}].
-proof.
-proc.
-if => //; auto => /> &2 _ mp _.
-by rewrite domP_eq.
-qed.
-*)
-
-lemma TRF_f_ll : islossless TRF.f.
-proof.
-proc; if; [auto => /> _ _; apply dtext_ll | auto].
-qed.
 
 (* module type of random function adversaries, parameterized
    by random function RF

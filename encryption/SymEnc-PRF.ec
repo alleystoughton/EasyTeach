@@ -1,3 +1,5 @@
+(* SymEnc-PRF.ec *)
+
 (* IND-CPA (indistinguishability under chosen plaintext attack)
    security for symmetric encryption built out of pseudorandom
    function *)
@@ -126,10 +128,10 @@ realize dtext_ll. apply dtext_ll. qed.
 
 type cipher = text * text.  (* ciphertexts *)
 
-(* encryption oracle limit before game's encryption*)
+(* encryption oracle limit before game's encryption *)
 op limit_pre : {int | 0 <= limit_pre} as ge0_limit_pre.
 
-(* encryption oracle limit after game's encryption*)
+(* encryption oracle limit after game's encryption *)
 op limit_post : {int | 0 <= limit_post} as ge0_limit_post.
 
 clone import SymEnc as SE with

@@ -16,10 +16,10 @@ type cipher.  (* ciphertexts *)
 
 op ciph_def : cipher.  (* default ciphertext *)
 
-(* encryption oracle limit before game's encryption*)
+(* encryption oracle limit before game's encryption *)
 op limit_pre : {int | 0 <= limit_pre} as ge0_limit_pre.
 
-(* encryption oracle limit after game's encryption*)
+(* encryption oracle limit after game's encryption *)
 op limit_post : {int | 0 <= limit_post} as ge0_limit_post.
 
 (* end theory parameters *)
@@ -119,17 +119,15 @@ module EncO (Enc : ENC) : EO = {
 
 (* encryption adversary, parameterized by encryption oracle, EO
 
-   choose may only call EO.pre; guess may only call EO.post *)
+   choose may only call EO.enc_pre; guess may only call EO.enc_post *)
 
 module type ADV (EO : EO) = {
   (* choose a pair of texts *)
-
   proc * choose() : text * text {EO.enc_pre}
 
   (* given cipher of one of texts previously chosen, try to
      guess which text it came from (true means first text,
      false means second text) *)
-
   proc guess(c : cipher) : bool {EO.enc_post}
 }.
 
@@ -142,7 +140,9 @@ module type ADV (EO : EO) = {
    from the first plaintext
 
    note: Adv may directly use Enc (which is stateless) as much as
-   it wants (and in any case could simulate it) *)
+   it wants (and in any case could simulate it), but the security
+   theorem must say it can't read/write the global variables of
+   EncO *)
 
 module INDCPA (Enc : ENC, Adv : ADV) = {
   module EO = EncO(Enc)        (* make EO from Enc *)
