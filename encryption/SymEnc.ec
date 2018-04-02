@@ -1,6 +1,7 @@
 (* SymEnc.ec *)
 
-(* Symmetric Encryption *)
+(* Symmetric Encryption: definitions, including games for judging
+   correctness and IND-CPA security *)
 
 prover ["!"].  (* no SMT solvers *)
 

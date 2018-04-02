@@ -188,6 +188,10 @@ apply dtext_ll.
 by rewrite -text_xorA text_xorK text_xor_rid.
 qed.
 
+(* standard encryption oracle *)
+
+module EO : EO = EncO(Enc).
+
 (* module turning an encryption adversary Adv into a random function
    adversary
 
@@ -276,10 +280,9 @@ axiom Adv_guess_ll :
   forall (EO <: EO{Adv}),
   islossless EO.enc_post => islossless Adv(EO).guess.
 
-module EO : EO = EncO(Enc).  (* standard encryption oracle *)
-
 (* version of encryption oracle that takes implementation of
-   RF as argument *)
+   RF as argument - instrumented to detect two distinct
+   kind of clashes *)
 
 local module EO_RF (RF : RF) : EO = {
   var ctr_pre : int
@@ -386,8 +389,7 @@ local lemma EO_EO_RF_PRF_enc_pre :
         ={x} /\ ={key}(EncO, PRF) /\ ={ctr_pre}(EncO, EO_RF) ==>
         ={res} /\ ={key}(EncO, PRF) /\ ={ctr_pre}(EncO, EO_RF)].
 proof.       
-proc; inline*.
-if => //; [wp; rnd; auto | auto].
+proc; inline*; if => //; [wp; rnd; auto | auto].
 qed.
 
 local lemma EO_EO_RF_PRF_enc_post :
@@ -395,14 +397,13 @@ local lemma EO_EO_RF_PRF_enc_post :
         ={x} /\ ={key}(EncO, PRF) /\ ={ctr_post}(EncO, EO_RF) ==>
         ={res} /\ ={key}(EncO, PRF) /\ ={ctr_post}(EncO, EO_RF)].
 proof.       
-proc; inline*.
-if => //; [wp; rnd; auto | auto].
+proc; inline*; if => //; [wp; rnd; auto | auto].
 qed.
 
 local lemma EO_EO_RF_PRF_genc :
   equiv[EO.genc ~ EO_RF(PRF).genc :
-        ={x} /\ ={key}(EncO, PRF) /\ ={key}(EncO, PRF) ==>
-        ={res} /\ ={key}(EncO, PRF) /\ ={key}(EncO, PRF)].
+        ={x} /\ ={key}(EncO, PRF) ==>
+        ={res} /\ ={key}(EncO, PRF)].
 proof.       
 proc; inline*; wp; rnd; auto.
 qed.
@@ -438,6 +439,10 @@ local lemma INDCPA_G1_TRF &m :
 proof.
 by rewrite (INDCPA_G1_PRF &m) (G1_GRF PRF &m) (G1_GRF TRF &m).
 qed.
+
+(* version of encryption oracle using TRF, and where
+   genc updates TRF.mp with randomly chosen u even
+   if clash_pre has happened *)
 
 local module EO_O : EO = {
   var ctr_pre : int
@@ -569,28 +574,25 @@ local lemma EO_RF_TRF_EO_O_enc_pre :
   equiv
   [EO_RF(TRF).enc_pre ~ EO_O.enc_pre :
    ={x, TRF.mp} /\
-   ={ctr_pre, clash_pre}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\
-   !EO_RF.clash_pre{1} ==>
+   ={ctr_pre}(EO_RF, EO_O) /\
+   EO_RF.inps_pre{1} = dom TRF.mp{1} ==>
    ={res, TRF.mp} /\
-   ={ctr_pre, clash_pre}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\
-   !EO_RF.clash_pre{1}].
+   ={ctr_pre}(EO_RF, EO_O) /\
+   EO_RF.inps_pre{1} = dom TRF.mp{1}].
 proof.
 proc.
 if => //.
 seq 2 2 :
   (={u, x, TRF.mp} /\
-   ={ctr_pre, clash_pre}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\
-   !EO_RF.clash_pre{1}).
+   ={ctr_pre}(EO_RF, EO_O) /\
+   EO_RF.inps_pre{1} = dom TRF.mp{1}).
 auto.
 wp; sp.
 inline *.
 wp; sp.
 if => //.
 auto; progress; by rewrite dom_set.
-auto => /> &2 _ mem_u_mp.
+auto => /> &2 mem_u_mp.
 rewrite fsetP => x.
 rewrite in_fsetU in_fset1.
 split => [[] //| -> //].
@@ -601,18 +603,18 @@ local lemma EO_RF_TRF_EO_O_enc_post :
   equiv
   [EO_RF(TRF).enc_post ~ EO_O.enc_post :
    ={x} /\ ={TRF.mp} /\
-   ={ctr_pre, ctr_post, clash_pre, genc_inp}(EO_RF, EO_O) /\
+   ={ctr_post, clash_pre, genc_inp}(EO_RF, EO_O) /\
    !EO_RF.clash_pre{1} ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
     ={res} /\ ={TRF.mp} /\
-    ={ctr_pre, ctr_post, genc_inp}(EO_RF, EO_O))].
+    ={ctr_post, genc_inp}(EO_RF, EO_O))].
 proof.
 proc.
 if; first move => /> &1 &2 not_clash_imp /not_clash_imp //.
 seq 2 2 :
   (={x, u} /\ ={TRF.mp} /\
-   ={ctr_pre, ctr_post, genc_inp, clash_pre}(EO_RF, EO_O) /\
+   ={ctr_post, genc_inp, clash_pre}(EO_RF, EO_O) /\
    ! EO_RF.clash_pre{1}).
 auto => /> &1 &2 not_clash_pre /not_clash_pre //.
 if => //.
@@ -631,21 +633,20 @@ local lemma EO_RF_TRF_EO_O_genc :
   equiv
   [EO_RF(TRF).genc ~ EO_O.genc :
    ={x, TRF.mp} /\
-   ={ctr_pre, ctr_post, clash_pre,
+   ={ctr_post, clash_pre,
      clash_post, genc_inp}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = dom TRF.mp{1} /\
    !EO_RF.clash_pre{1} ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
     ={res, TRF.mp} /\
-    ={ctr_pre, ctr_post, clash_pre,
-      clash_post, genc_inp}(EO_RF, EO_O) /\
-    !EO_RF.clash_pre{1})].
+    ={ctr_post, clash_pre,
+      clash_post, genc_inp}(EO_RF, EO_O))].
 proof.
 proc.
 seq 1 1 :
   (={x, u, TRF.mp} /\
-   ={ctr_pre, ctr_post, clash_pre,
+   ={ctr_post, clash_pre,
      clash_post, genc_inp}(EO_RF, EO_O) /\
     EO_RF.inps_pre{1} = dom TRF.mp{1} /\
    !EO_RF.clash_pre{1}).
@@ -655,8 +656,7 @@ wp; sp; inline *.
 wp; sp.
 rcondf{1} 1; first auto.
 auto; progress; apply dtext_ll.
-wp; sp.
-inline *.
+wp; sp; inline *.
 wp; sp.
 rcondt{1} 1; first auto.
 auto; progress; by rewrite getP_eq oget_some.
@@ -693,7 +693,7 @@ conseq EO_RF_TRF_EO_O_enc_pre => //.
 auto.
 seq 1 1 :
   (={b, x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_pre, ctr_post, clash_pre,
+   ={ctr_post, clash_pre,
      clash_post, genc_inp}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = dom TRF.mp{1} /\
    !EO_RF.clash_pre{1}).
@@ -703,26 +703,26 @@ seq 1 1 :
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
     ={c, TRF.mp, glob Adv} /\
-    ={ctr_pre, ctr_post, clash_pre,
+    ={ctr_post, clash_pre,
       clash_post, genc_inp}(EO_RF, EO_O) /\
     !EO_RF.clash_pre{1})).
 call EO_RF_TRF_EO_O_genc.
-auto.
+auto; move => /> //.
 exists* EO_RF.clash_pre{1}; elim* => clash_pre.
 call
   (_ :
    ={clash_pre}(EO_RF, EO_O) /\ clash_pre = EO_RF.clash_pre{1} /\
    (! EO_RF.clash_pre{1} =>
     ={glob Adv, c, TRF.mp} /\
-    ={ctr_pre, ctr_post, genc_inp}(EO_RF, EO_O)) ==>
+    ={ctr_post, genc_inp}(EO_RF, EO_O)) ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} => ! clash_pre /\
     ={res} /\ ={TRF.mp} /\
-    ={ctr_pre, ctr_post, genc_inp}(EO_RF, EO_O))).
+    ={ctr_post, genc_inp}(EO_RF, EO_O))).
 proc
   (EO_O.clash_pre)
   (={TRF.mp} /\
-   ={ctr_pre, ctr_post, genc_inp, clash_pre}(EO_RF, EO_O) /\
+   ={ctr_post, genc_inp, clash_pre}(EO_RF, EO_O) /\
    !clash_pre)
   (EO_RF.clash_pre{1}).
 by move => /> &1 &2 not_clash_imp /not_clash_imp.
@@ -786,7 +786,7 @@ seq 2 :
   (EO_O.clash_pre)
   (limit_pre%r / (2 ^ text_len)%r)
   (1%r)
-  ((2 ^ text_len - limit_pre)%r/(2 ^ text_len)%r)
+  ((2 ^ text_len - limit_pre)%r / (2 ^ text_len)%r)
   (0%r).
 auto.
 conseq
@@ -911,6 +911,9 @@ rewrite
   1:ler_dist_add (INDCPA_G1_TRF &m) ler_add2l (G1_TRF_G2 &m).
 qed.
 
+(* version of encryption oracle in which genc doesn't update
+   TRF.mp at all *)
+
 local module EO_I : EO = {
   var ctr_pre : int
   var ctr_post : int
@@ -1033,13 +1036,12 @@ qed.
 
 local lemma EO_O_EO_I_genc :
   equiv[EO_O.genc ~ EO_I.genc :
-        ={x, TRF.mp} /\ ={genc_inp}(EO_O, EO_I) ==>
+        ={x, TRF.mp} ==>
         ={res} /\ ={genc_inp}(EO_O, EO_I) /\
         eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2})].
 proof.        
 proc.
-seq 1 1 : 
-  (={u, x, TRF.mp} /\ ={genc_inp}(EO_O, EO_I));
+seq 1 1 : (={u, x, TRF.mp});
   first auto.
 if => //.
 auto; progress; rewrite set_eq_except.
@@ -1087,7 +1089,7 @@ auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp not_mem_u_dom_mp1 z _.
 split.
 congr; by rewrite 2!getP.
 by rewrite eq_except_set.
-auto => /> &1 &2 _ _ eq_exc ne_u_gencinp u_not_in_dom_mp1.
+auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp u_not_in_dom_mp1.
 congr; congr.
 rewrite eq_exceptP in eq_exc.
 by rewrite eq_exc /pred1.
@@ -1192,9 +1194,9 @@ proc; rcondt 1; first auto.
 wp; sp; elim* => ctr_post.
 seq 2 :
   (EO_I.clash_post)
-  (1%r/(2 ^ text_len)%r)
+  (1%r / (2 ^ text_len)%r)
   (1%r)
-  ((2 ^ text_len - 1)%r/(2 ^ text_len)%r)
+  ((2 ^ text_len - 1)%r / (2 ^ text_len)%r)
   (0%r).
 auto.
 wp.
@@ -1260,6 +1262,10 @@ rewrite
   1:ler_dist_add mulrDl addrA ler_add 1:(INDCPA_G2 &m) (G2_G3 &m).
 qed.
 
+(* version of encryption oracle in which right side of
+   ciphertext produced by genc doesn't reference plaintext
+   at all *)
+
 local module EO_R : EO = {
   var ctr_pre : int
   var ctr_post : int
@@ -1323,7 +1329,7 @@ local module G4 = {
 }.    
 
 local lemma EO_R_enc_pre_ll :
-  phoare [EO_R.enc_pre : true ==> true] = 1%r.
+  phoare[EO_R.enc_pre : true ==> true] = 1%r.
 proof.
 proc.
 if.
@@ -1342,7 +1348,7 @@ auto.
 qed.
 
 local lemma EO_R_enc_post_ll :
-  phoare [EO_R.enc_post : true ==> true] = 1%r.
+  phoare[EO_R.enc_post : true ==> true] = 1%r.
 proof.
 proc.
 if.
@@ -1361,7 +1367,7 @@ auto.
 qed.
 
 local lemma EO_R_genc_ll :
-  phoare [EO_R.genc : true ==> true] = 1%r.
+  phoare[EO_R.genc : true ==> true] = 1%r.
 proof.
 proc.
 auto; progress; by rewrite dtext_ll.
@@ -1369,8 +1375,7 @@ qed.
 
 local lemma EO_I_EO_R_genc :
   equiv[EO_I.genc ~ EO_R.genc :
-        ={TRF.mp} /\ ={ctr_pre, ctr_post}(EO_I, EO_R) ==>
-        ={res, TRF.mp} /\ ={ctr_pre, ctr_post}(EO_I, EO_R)].
+        ={TRF.mp} ==> ={res, TRF.mp}].
 proof.
 proc.
 wp.
@@ -1394,14 +1399,14 @@ seq 1 1 :
 inline*; auto.
 seq 1 1 :
   (={x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_pre, ctr_post}(EO_I, EO_R)); first sim.
+   ={ctr_post}(EO_I, EO_R)); first sim.
 seq 1 1 :
   (={b, x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_pre, ctr_post}(EO_I, EO_R)).
+   ={ctr_post}(EO_I, EO_R)).
 auto.
 seq 1 1 :
   (={c, b, x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_pre, ctr_post}(EO_I, EO_R)).
+   ={ctr_post}(EO_I, EO_R)).
 call EO_I_EO_R_genc.
 auto.
 sim.
@@ -1443,12 +1448,12 @@ end section.
 (* IND-CPA security theorem
 
    we need to assume Adv is lossless and that it doesn't interact with
-   EO or PRF/TRF/Adv2RFA (which appear in the upper bound)
+   EncO or PRF/TRF/Adv2RFA (which appear in the upper bound)
 
    because Enc is stateless, Adv may use it (and in any event could
    simulate it) *)
 
-lemma INDCPA (Adv <: ADV{EO, PRF, TRF, Adv2RFA}) &m :
+lemma INDCPA (Adv <: ADV{EncO, PRF, TRF, Adv2RFA}) &m :
   (forall (EO <: EO{Adv}),
    islossless EO.enc_pre => islossless Adv(EO).choose) =>
   (forall (EO <: EO{Adv}),
