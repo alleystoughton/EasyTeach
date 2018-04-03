@@ -27,7 +27,7 @@ trivial.
 move => not_P_x.
 have ex_x_not_P_x : exists (x : 'a), ! P x.
   exists x.
-  trivial.
+  apply not_P_x.
 trivial.
 qed.
 
