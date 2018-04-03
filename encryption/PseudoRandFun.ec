@@ -12,6 +12,10 @@ type key.  (* PRF keys *)
 
 op dkey : key distr.  (* full, uniform and lossless distribution on keys *)
 
+(* full means every element of type has non-zero value in distribution;
+   uniform means every element of type has the same value in distribution;
+   lossless means the sum of the type's values in distribution is 1 *)
+
 axiom dkey_fu : is_full dkey.
 axiom dkey_uni : is_uniform dkey.
 axiom dkey_ll : is_lossless dkey.
@@ -57,15 +61,16 @@ module PRF : RF = {
 (* random function implemention using true randomness *)
 
 module TRF : RF = {
+  (* mp is a finite map associating texts with texts *)
   var mp : (text, text) fmap
 
   proc init() : unit = {
-    mp <- map0;
+    mp <- map0;  (* empty map *)
   }
 
   proc f(x : text) : text = {
-    if (! mem (dom mp) x) {
-      mp.[x] <$ dtext;
+    if (! mem (dom mp) x) {  (* give x a random value in *)
+      mp.[x] <$ dtext;       (* mp if not already in mp's domain *)
     }
     return oget mp.[x];
   }
@@ -86,7 +91,8 @@ module type RFA (RF : RF) = {
    `|Pr[GRF(PRF, RFA).main() @ &m : res] -
      Pr[GRF(TRF, RFA).main() @ &m : res]|
 
-   may be negligible, if F is "good" and RFA is limited *)
+   may be negligible, if F is "good", RFA is limited and RFA can't
+   read/write the global variables of PRF/TRF *)
 
 module GRF (RF : RF, RFA : RFA) = {
   module A = RFA(RF)

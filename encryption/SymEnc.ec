@@ -1,7 +1,9 @@
 (* SymEnc.ec *)
 
-(* Symmetric Encryption: definitions, including games for judging
-   correctness and IND-CPA security *)
+(* Symmetric Encryption *)
+
+(* definitions, including games for judging correctness and IND-CPA
+   (indistinguishability under chosen plaintext attack) security *)
 
 prover ["!"].  (* no SMT solvers *)
 
@@ -123,12 +125,12 @@ module EncO (Enc : ENC) : EO = {
    choose may only call EO.enc_pre; guess may only call EO.enc_post *)
 
 module type ADV (EO : EO) = {
-  (* choose a pair of texts *)
+  (* choose a pair of plaintexts, x1/x2 *)
   proc * choose() : text * text {EO.enc_pre}
 
-  (* given cipher of one of texts previously chosen, try to
-     guess which text it came from (true means first text,
-     false means second text) *)
+  (* given ciphertext c based on a random boolean b (the encryption
+     using EO.genc of x1 if b = true, the encryption of x2 if b =
+     false), try to guess b *)
   proc guess(c : cipher) : bool {EO.enc_post}
 }.
 
@@ -138,12 +140,21 @@ module type ADV (EO : EO) = {
    an encryption scheme is secure iff the probability of main
    returning true (Adv winning the game) is close to 1/2, i.e., Adv
    isn't doing much better than always guessing the ciphertext comes
-   from the first plaintext
+   from the first plaintext, or of making a random guess
 
-   note: Adv may directly use Enc (which is stateless) as much as
-   it wants (and in any case could simulate it), but the security
-   theorem must say it can't read/write the global variables of
-   EncO *)
+   formally, we want that the absolute value of the difference between
+   the probability that main returns true and 1/2 to be small; this
+   says that Adv can neither win nor lose with probability much
+   different than 1/2 (if it could reliably lose, the addition of
+   a negation would result in an adversary that could reliably win)
+
+   because Adv can use EO to encrypt the plaintexts it chooses,
+   the encryption procedure of a secure encryption scheme is
+   necessarily probabilistic
+
+   Adv may directly use Enc (which is stateless) as much as it wants
+   (and in any case could simulate it), but the security theorem must
+   say it can't read/write the global variables of EncO *)
 
 module INDCPA (Enc : ENC, Adv : ADV) = {
   module EO = EncO(Enc)        (* make EO from Enc *)
