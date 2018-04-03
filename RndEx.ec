@@ -28,13 +28,10 @@ proc.
 seq 0 1 : (true).
 rnd{2}; skip; apply dbool_ll.
 rnd (fun x => x ^^ b1{2}).
-skip => _ &2 /=.
-split => [x _ | _].
+skip; progress.
 by rewrite xorA xorK xor_false.
-split => [x _ | _ b _].
 by rewrite !dbool1E.
-split => [| _]; first rewrite dbool_fu.
-split => [| _].
+rewrite dbool_fu.
 by rewrite xorA xorK xor_false.
 by rewrite xorC xorA xorK xor_false. 
 qed.
