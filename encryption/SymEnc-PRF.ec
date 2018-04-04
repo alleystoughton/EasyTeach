@@ -266,7 +266,8 @@ module Adv2RFA(Adv : ADV, RF : RF) = {
 (* see after section for security theorem
 
    in the proof, we connect the INDCPA game to a game that returns
-   true with probability 1/2, via a sequence of intermediate games *)
+   true with probability 1/2, via a sequence of 4 intermediate
+   games *)
 
 section.
 
@@ -523,7 +524,7 @@ local module G2 = {
   }
 }.    
 
-(* we use upto bad reasoning to connect G1 and G2 *)
+(* we use upto bad reasoning to connect G1(TRF) and G2 *)
 
 local lemma EO_O_enc_pre_ll : islossless EO_O.enc_pre.
 proof.
@@ -867,7 +868,11 @@ by rewrite -eq_iff.
 by conseq G1_TRF_G2_main.
 qed.
 
-(* now we use triangular inequality to summarize: *)
+(* now we use triangular inequality
+
+    |x - z| <= |x - y| + |y - z]
+
+   to summarize: *)
 
 local lemma INDCPA_G2 &m :
   `|Pr[INDCPA(Enc, Adv).main() @ &m : res] - Pr[G2.main() @ &m : res]| <=
