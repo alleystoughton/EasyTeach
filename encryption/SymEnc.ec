@@ -19,7 +19,10 @@ type cipher.  (* ciphertexts *)
 
 op ciph_def : cipher.  (* default ciphertext *)
 
-(* encryption oracle limit before game's encryption *)
+(* encryption oracle limit before game's encryption
+
+   this says limit_pre has type int and the axiom ge0_limit_pre says
+   limit_pre is non-negative *)
 op limit_pre : {int | 0 <= limit_pre} as ge0_limit_pre.
 
 (* encryption oracle limit after game's encryption *)
