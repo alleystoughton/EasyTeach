@@ -1273,7 +1273,8 @@ local module EO_R : EO = {
   }
 }.
 
-(* game using EO_R *)
+(* game using EO_R, and where argument to EO_R.genc is independent
+   from x1/x2 *)
 
 local module G4 = {
   module A = Adv(EO_R)
@@ -1324,6 +1325,8 @@ local lemma EO_R_genc_ll :
 proof.
 proc; auto; progress; by rewrite dtext_ll.
 qed.
+
+(* note no assumption about genc's argument, x *)
 
 local lemma EO_I_EO_R_genc :
   equiv[EO_I.genc ~ EO_R.genc :
