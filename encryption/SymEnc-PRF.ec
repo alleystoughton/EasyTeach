@@ -1330,7 +1330,7 @@ qed.
 
 local lemma EO_I_EO_R_genc :
   equiv[EO_I.genc ~ EO_R.genc :
-        ={TRF.mp} ==> ={res, TRF.mp}].
+        true ==> ={res}].
 proof.
 proc.
 wp.
