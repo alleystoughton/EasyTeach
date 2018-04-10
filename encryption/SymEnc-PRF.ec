@@ -1340,8 +1340,7 @@ by rewrite -text_xorA text_xorK text_xor_rid.
 by rewrite 2!mu1_dtext.
 rewrite dtext_fu.
 by rewrite -text_xorA text_xorK text_xor_rid.
-rewrite text_xorC.
-trivial.
+by rewrite text_xorC.
 qed.
 
 local lemma G3_G4 &m :
