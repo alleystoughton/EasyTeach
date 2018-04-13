@@ -6,7 +6,7 @@
 
 prover ["!"].  (* no SMT solvers *)
 
-require export AllCore Distr DBool List NewFMap FSet Mu_mem.
+require export AllCore Distr DBool List SmtMap FSet Mu_mem.
 require import StdBigop. import Bigreal BRA.
 require import StdOrder. import RealOrder.
 require import StdRing. import RField.
@@ -480,7 +480,7 @@ local module EO_O : EO = {
   proc genc(x : text) : cipher = {
     var u, v : text; var c : cipher;
     u <$ dtext;
-    if (mem (dom TRF.mp) u) {
+    if (u \in TRF.mp) {
       clash_pre <- true;
     }
     genc_inp <- u;
@@ -574,23 +574,23 @@ local lemma EO_RF_TRF_EO_O_enc_pre :
   equiv
   [EO_RF(TRF).enc_pre ~ EO_O.enc_pre :
    ={x, TRF.mp} /\ ={ctr_pre}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} ==>
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} ==>
    ={res, TRF.mp} /\ ={ctr_pre}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1}].
+   EO_RF.inps_pre{1} = fdom TRF.mp{1}].
 proof.
 proc.
 if => //.
 seq 2 2 :
   (={u, x, TRF.mp} /\ ={ctr_pre}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1}).
+   EO_RF.inps_pre{1} = fdom TRF.mp{1}).
 auto.
 wp; sp; inline *; wp; sp.
 if => //.
-auto; progress; by rewrite dom_set.
+auto; progress; by rewrite fdom_set.
 auto => /> &2 mem_u_mp.
 rewrite fsetP => x.
 rewrite in_fsetU in_fset1.
-split => [[] //| -> //].
+split => [[] // -> | -> //]; by rewrite mem_fdom.
 auto.
 qed.
 
@@ -623,7 +623,7 @@ local lemma EO_RF_TRF_EO_O_genc :
   [EO_RF(TRF).genc ~ EO_O.genc :
    ={x, TRF.mp} /\
    ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1} ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
@@ -634,15 +634,18 @@ proc.
 seq 1 1 :
   (={x, u, TRF.mp} /\
    ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 auto.
-if => //.
+if.
+progress; [by rewrite -mem_fdom | by rewrite mem_fdom].
 wp; sp; inline *; wp; sp.
-rcondf{1} 1; first auto.
+rcondf{1} 1.
+auto => />; by rewrite mem_fdom.
 auto; progress; apply dtext_ll.
 wp; sp; inline *; wp; sp.
-rcondt{1} 1; first auto.
-auto; progress; by rewrite getP_eq oget_some.
+rcondt{1} 1.
+auto => />; by rewrite mem_fdom.
+auto; progress; by rewrite get_set_eqE.
 qed.
 
 local lemma G1_TRF_G2_main :
@@ -656,25 +659,25 @@ proc.
 seq 1 1 :
   (={TRF.mp} /\
    ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1}).
-inline *; auto; progress; by rewrite dom0.
+inline *; auto; progress; by rewrite fdom0.
 seq 1 1 :
   (={x1, x2, TRF.mp, glob Adv} /\
    ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 call
   (_ :
    ={TRF.mp} /\
    ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1}).
 conseq EO_RF_TRF_EO_O_enc_pre => //.
 auto.
 seq 1 1 :
   (={b, x1, x2, TRF.mp, glob Adv} /\
    ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = dom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
+   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 auto.
 seq 1 1 :
   (={b, x1, x2} /\
@@ -721,13 +724,13 @@ qed.
 local lemma EO_O_enc_pre_pres_invar :
   phoare
   [EO_O.enc_pre :
-   card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre ==>
-   card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre] =
+   card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre ==>
+   card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre] =
   (1%r).
 proof.
 proc.
 if.
-seq 2 : (card (dom TRF.mp) < EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
+seq 2 : (card (fdom TRF.mp) < EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
 auto.
 rnd; auto => /> &hr le_card_dom_mp_ctr _ _ lt_ctr_limit.
 split.
@@ -737,8 +740,8 @@ inline*; wp; sp; if.
 rnd predT.
 auto => /> &hr lt_card_dom_mp_ctr _ _ not_mem_u_dom_mp.
 split => [| _ y _ _]; first apply dtext_ll.
-by rewrite dom_set fcardUI_indep 1:fsetI1 1:not_mem_u_dom_mp // fcard1
-           addzC lez_add1r.
+by rewrite fdom_set fcardUI_indep 1:fsetI1 1:mem_fdom
+           1:not_mem_u_dom_mp // fcard1 addzC lez_add1r.
 auto; progress; by rewrite ltzW.
 hoare; simplify.
 rnd; auto => /> &hr le_card_dom_mp_ctr _ _ lt_ctr_limit u _.
@@ -750,7 +753,7 @@ qed.
 local lemma EO_O_genc_clash_up :
   phoare
   [EO_O.genc :
-   card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre ==>
+   card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre ==>
    EO_O.clash_pre] <=
   (limit_pre%r / (2 ^ text_len)%r).
 proof.
@@ -764,18 +767,20 @@ seq 2 :
 auto.
 conseq
   (_ :
-   card (dom TRF.mp) <= limit_pre /\ !EO_O.clash_pre ==>
+   card (fdom TRF.mp) <= limit_pre /\ !EO_O.clash_pre ==>
    _ : <=
   (limit_pre%r / (2 ^ text_len)%r)).
 move => /> &hr le_card_dom_mp_ctr le_ctr_limit _.
 by apply (lez_trans EO_O.ctr_pre{hr}).
 wp; simplify.
-rnd (mem (dom TRF.mp)).
+rnd (mem (fdom TRF.mp)).
 auto => /> &hr le_card_dom_mp_limit not_clash.
 split => [| _ x _ contrad].
 by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0
            1:le_fromint 1:ltzW 1:powPos // le_fromint.
-case (x \in dom TRF.mp{hr}) => // /contrad //.
+case (x \in fdom TRF.mp{hr}) => // x_notin_dom_mp.
+rewrite mem_fdom in x_notin_dom_mp.
+have // : EO_O.clash_pre{hr} by rewrite contrad.
 conseq (_ : _ ==> _ : = (1%r)).
 auto; progress; by rewrite dtext_ll.
 hoare; inline *; auto; progress.
@@ -789,7 +794,7 @@ proof.
 byphoare => //.
 proc.
 seq 1 :
-  (card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre)
+  (card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre)
   (1%r)
   (limit_pre%r / (2 ^ text_len)%r)
   (0%r)
@@ -797,12 +802,12 @@ seq 1 :
 last 2 first.
 hoare.
 inline*; auto.
-rewrite dom0 fcards0 /= ge0_limit_pre.
+rewrite fdom0 fcards0 /= ge0_limit_pre.
 trivial.
 inline*; auto.
 inline*; auto.
 seq 2 :
-  (card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre)
+  (card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre)
   (1%r)
   (limit_pre%r / (2 ^ text_len)%r)
   (0%r)
@@ -810,7 +815,7 @@ seq 2 :
 last 2 first.
 hoare.
 rnd.
-call (_ : card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
+call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
 conseq (_ : _ ==> _ : = (1%r)).
 apply EO_O_enc_pre_pres_invar.
 auto.
@@ -824,7 +829,7 @@ apply EO_O_enc_pre_ll.
 auto.
 rnd.
 conseq (_ : _ ==> _ : = (1%r)).
-call (_ : card (dom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
+call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
 apply Adv_choose_ll.
 apply EO_O_enc_pre_pres_invar.
 auto.
@@ -920,7 +925,7 @@ local module EO_I : EO = {
   proc genc(x : text) : cipher = {
     var u, v : text; var c : cipher;
     u <$ dtext;
-    if (mem (dom TRF.mp) u) {
+    if (u \in TRF.mp) {
       clash_pre <- true;
     }
     genc_inp <- u;
@@ -1011,13 +1016,13 @@ local lemma EO_O_EO_I_genc :
   equiv[EO_O.genc ~ EO_I.genc :
         ={x, TRF.mp} ==>
         ={res} /\ ={genc_inp}(EO_O, EO_I) /\
-        eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2})].
+        eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}].
 proof.        
 proc.
 seq 1 1 : (={u, x, TRF.mp}); first auto.
 if => //.
-auto; progress; rewrite set_eq_except.
-auto; progress; rewrite set_eq_except.
+auto; progress; rewrite eq_except1Sm.
+auto; progress; rewrite eq_except1Sm.
 qed.
 
 local lemma EO_O_EO_I_enc_post :
@@ -1025,12 +1030,12 @@ local lemma EO_O_EO_I_enc_post :
         ={x} /\
         ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
         !EO_O.clash_post{1} /\
-        eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2}) ==>
+        eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2} ==>
         ={clash_post}(EO_O, EO_I) /\
         (!EO_O.clash_post{1} =>
          ={res} /\
          ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
-         eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2}))].
+         eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2})].
 proof.
 proc.
 if => //.
@@ -1038,7 +1043,7 @@ seq 2 2 :
   (={x, u} /\ !EO_O.clash_post{1} /\
    ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
    EO_O.ctr_post{1} <= limit_post /\
-   eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2})).
+   eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}).
 auto; progress; by rewrite -ltzE.
 if => //.
 wp; sp.
@@ -1054,13 +1059,13 @@ inline*; wp; sp.
 if => //.
 move => /> &1 &2 _ _ eq_exc ne_u_genc_inp.
 split => [u_in_dom_mp1 | u_in_dom_mp2].
-by apply (eq_except_dom EO_I.genc_inp{2} u{2} TRF.mp{1} TRF.mp{2}).
-rewrite (eq_except_dom EO_I.genc_inp{2} u{2} TRF.mp{2} TRF.mp{1})
+by apply (eq_except_ne_in EO_I.genc_inp{2} u{2} TRF.mp{1} TRF.mp{2}).
+rewrite (eq_except_ne_in EO_I.genc_inp{2} u{2} TRF.mp{2} TRF.mp{1})
         1:eq_except_sym //.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp not_mem_u_dom_mp1 z _.
 split.
-congr; by rewrite 2!getP.
-by rewrite eq_except_set.
+congr; by rewrite 2!get_set_sameE.
+by rewrite eq_exceptSS_eq.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp u_not_in_dom_mp1.
 congr; congr.
 rewrite eq_exceptP in eq_exc.
@@ -1098,20 +1103,20 @@ seq 1 1 :
   (={c, b, glob Adv} /\
    ={ctr_post, clash_post}(EO_O, EO_I) /\
    !EO_O.clash_post{1} /\ ={genc_inp}(EO_O, EO_I) /\ 
-   eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2})).
+   eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}).
 call EO_O_EO_I_genc; first auto.
 call
   (_ :
    ={c, glob Adv} /\
    ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
    !EO_O.clash_post{1} /\
-   eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2}) ==>
+   eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2} ==>
    ={clash_post}(EO_O, EO_I) /\
    (!EO_O.clash_post{1} => ={res})).
 proc
   (EO_I.clash_post)
   (={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
-   eq_except TRF.mp{1} TRF.mp{2} (pred1 EO_I.genc_inp{2}))
+   eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2})
   (EO_O.clash_post{1}).
 trivial.
 move => &1 &2.
