@@ -2,7 +2,7 @@
 
 (* Pseudorandom Functions (PRFs) *)
 
-prover ["!"].  (* no SMT solvers *)
+prover [""].  (* no SMT solvers *)
 
 require import AllCore Distr DBool FSet NewFMap.
 

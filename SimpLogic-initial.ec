@@ -2,7 +2,7 @@
 
 (* less sophisticated version of SimpLogic.ec *)
 
-prover ["!"].  (* no SMT solvers *)
+prover [""].  (* no SMT solvers *)
 
 lemma fa_imp_not_ex_not (P : 'a -> bool) :
   (forall (x : 'a), P x) => ! exists (x : 'a), ! P x.

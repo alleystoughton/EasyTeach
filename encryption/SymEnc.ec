@@ -5,7 +5,7 @@
 (* definitions, including games for judging correctness and IND-CPA
    (indistinguishability under chosen plaintext attack) security *)
 
-prover ["!"].  (* no SMT solvers *)
+prover [""].  (* no SMT solvers *)
 
 require import AllCore Distr DBool.
 

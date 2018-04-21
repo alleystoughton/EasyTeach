@@ -4,7 +4,7 @@
    security for symmetric encryption built out of pseudorandom
    function *)
 
-prover ["!"].  (* no SMT solvers *)
+prover [""].  (* no SMT solvers *)
 
 require export AllCore Distr DBool List NewFMap FSet Mu_mem.
 require import StdBigop. import Bigreal BRA.

@@ -4,7 +4,7 @@
 
 (* Lemmas that probably should be in EasyCrypt Library *)
 
-prover ["!"].  (* no SMT solvers *)
+prover [""].  (* no SMT solvers *)
 
 require import AllCore FSet NewFMap.
 
