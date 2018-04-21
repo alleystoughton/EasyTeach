@@ -1,6 +1,6 @@
 (* RndEx.ec *)
 
-prover ["!"].  (* no SMT solvers *)
+prover [""].  (* no SMT solvers *)
 
 require import AllCore Bool Distr DBool.
 
