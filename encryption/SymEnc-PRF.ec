@@ -1020,9 +1020,7 @@ local lemma EO_O_EO_I_genc :
 proof.        
 proc.
 seq 1 1 : (={u, x, TRF.mp}); first auto.
-if => //.
-auto; progress; rewrite eq_except1Sm.
-auto; progress; rewrite eq_except1Sm.
+if => //; auto; progress; rewrite eq_except_setl.
 qed.
 
 local lemma EO_O_EO_I_enc_post :
@@ -1065,7 +1063,7 @@ rewrite (eq_except_ne_in EO_I.genc_inp{2} u{2} TRF.mp{2} TRF.mp{1})
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp not_mem_u_dom_mp1 z _.
 split.
 congr; by rewrite 2!get_set_sameE.
-by rewrite eq_exceptSS_eq.
+by rewrite eq_except_set_eq.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp u_not_in_dom_mp1.
 congr; congr.
 rewrite eq_exceptP in eq_exc.
