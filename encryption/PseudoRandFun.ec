@@ -4,7 +4,7 @@
 
 prover [""].  (* no SMT solvers *)
 
-require import AllCore Distr DBool FSet NewFMap.
+require import AllCore Distr DBool FSet SmtMap.
 
 (* theory parameters *)
 
@@ -65,12 +65,12 @@ module TRF : RF = {
   var mp : (text, text) fmap
 
   proc init() : unit = {
-    mp <- map0;  (* empty map *)
+    mp <- empty;  (* empty map *)
   }
 
   proc f(x : text) : text = {
-    if (! mem (dom mp) x) {  (* give x a random value in *)
-      mp.[x] <$ dtext;       (* mp if not already in mp's domain *)
+    if (! x \in mp) {   (* give x a random value in *)
+      mp.[x] <$ dtext;  (* mp if not already in mp's domain *)
     }
     return oget mp.[x];
   }
