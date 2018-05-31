@@ -780,7 +780,7 @@ by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0
            1:le_fromint 1:ltzW 1:powPos // le_fromint.
 case (x \in fdom TRF.mp{hr}) => // x_notin_dom_mp.
 rewrite mem_fdom in x_notin_dom_mp.
-have // : EO_O.clash_pre{hr} by rewrite contrad.
+trivial.
 conseq (_ : _ ==> _ : = (1%r)).
 auto; progress; by rewrite dtext_ll.
 hoare; inline *; auto; progress.
@@ -1172,11 +1172,7 @@ auto.
 wp.
 rnd (pred1 EO_I.genc_inp).
 auto => /> &hr _ _ not_clash _.
-split => [| _ x _ x_ne_genc_inp_imp_clash].
 by rewrite mu1_dtext.
-rewrite /pred1.
-case (x = EO_I.genc_inp{hr}) => //.
-move => /x_ne_genc_inp_imp_clash //.
 inline*; wp; sp; if; auto.
 hoare; inline*; wp; sp; if; auto.
 trivial.
