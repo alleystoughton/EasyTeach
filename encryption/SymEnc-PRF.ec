@@ -816,7 +816,7 @@ last 2 first.
 hoare.
 rnd.
 call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
-conseq (_ : _ ==> _ : = (1%r)).
+conseq (_ : _ ==> _ : = (1%r)) => //.
 apply EO_O_enc_pre_pres_invar.
 auto.
 trivial.
@@ -824,7 +824,7 @@ rnd.
 simplify.
 conseq (_ : true ==> true).
 call (_ : true).
-conseq (_ : _ ==> true : = (1%r)).
+conseq (_ : _ ==> true : = (1%r)) => //.
 apply EO_O_enc_pre_ll.
 auto.
 rnd.
@@ -843,7 +843,7 @@ last 2 first.
 hoare.
 conseq (_ : true ==> true).
 call (_ : true).
-conseq (_ : _ ==> true : = (1%r)).
+conseq (_ : _ ==> true : = (1%r)) => //.
 apply EO_O_enc_post_ll.
 auto.
 trivial.
