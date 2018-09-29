@@ -30,7 +30,16 @@ exclusive or of two randomly chosen booleans. Among other facts,
 it is proved that both procedures are equally likely to return
 true, and equally likely to return false.
 
-Third Example: Symmetric Encryption from Pseudorandom Functions
+Third Example: Secure Message Communication Via One-time Pad in
+Real/Ideal Paradigm Style
+--------------------------------------------------------------------
+
+[`SMC.ec`](../master/SMC.ec) contains the formalization and security
+proof of two-party secure message communication via a one-time
+pad. This is done using the Real/Ideal Paradigm (but in a non-UC
+(Universally Composable Security) style).
+
+Fourth Example: Symmetric Encryption from Pseudorandom Functions
 --------------------------------------------------------------------
 
 The subdirectory [`encryption`](../master/encryption) contains the proof
