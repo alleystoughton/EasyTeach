@@ -94,9 +94,9 @@ module GReal (Adv : ADV) = {
 
   proc main() : bool = {
     var b : bool;
-    var pad, x, y, z : bits;
+    var x, y, z : bits;
 
-    x <@ Adv.get();    (* get message to from Adversary, give to Party 1 *)
+    x <@ Adv.get();    (* get message from Adversary, give to Party 1 *)
     gen();             (* generate and share to parties one-time pad *)
     y <@ party(x);     (* Party 1 encrypts x, yielding y *)
     Adv.obs(y);        (* y is observed in transit between parties
@@ -121,7 +121,7 @@ module type SIM = {
 module GIdeal(Sim : SIM, Adv : ADV) = {
   proc main() : bool = {
     var b : bool;
-    var pad, x, y : bits;
+    var x, y : bits;
 
     x <@ Adv.get();     (* get message from Adversary *)
     y <@ Sim.choose();  (* simulate message encryption *)
