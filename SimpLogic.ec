@@ -23,3 +23,14 @@ lemma fa_iff_not_ex_not (P : 'a -> bool) :
 proof.
 split; [apply fa_imp_not_ex_not | apply not_ex_not_imp_fa].
 qed.
+
+(* we can do the above using a lemma in the EasyCrypt Library: *)
+
+lemma fa_iff_not_ex_not' (P : 'a -> bool) :
+  (forall (x : 'a), P x) <=> ! exists (x : 'a), ! P x.
+proof.
+(* to see the lemma's statement, use
+print negb_exists.
+*)
+by rewrite negb_exists.
+qed.
