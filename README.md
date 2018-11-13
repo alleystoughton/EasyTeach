@@ -18,7 +18,9 @@ First Example: Simple Logic
 showing how universal quantification can be expressed in terms
 of existential quantification and negation. (The file 
 [`SimpLogic-initial.ec`](../master/SimpLogic-initial.ec) contains
-a less sophisticated precursor to the final, terser proof.)
+a less sophisticated precursor to the final, terser proof. And the file
+[`SimpLogic-fill.ec`](../master/SimpLogic-fill.ec) omits the
+proofs, allowing them to be filled in.)
 
 Second Example: Random Assignment
 --------------------------------------------------------------------
@@ -28,7 +30,9 @@ two procedures involving random assignments. The first procedure
 returns a randomly chosen boolean, whereas the second returns the
 exclusive or of two randomly chosen booleans. Among other facts,
 it is proved that both procedures are equally likely to return
-true, and equally likely to return false.
+true, and equally likely to return false. The file
+[`RndEx-fill.ec`](../master/RndEx-fill.ec) omits the proofs,
+allowing them to be filled-in.
 
 Third Example: Secure Message Communication Via One-time Pad in
 Real/Ideal Paradigm Style
@@ -37,7 +41,9 @@ Real/Ideal Paradigm Style
 [`SMC.ec`](../master/SMC.ec) contains the formalization and security
 proof of two-party secure message communication via a one-time
 pad. This is done using the Real/Ideal Paradigm (but in a non-UC
-(Universally Composable Security) style).
+(Universally Composable Security) style). 
+The file [`SMC-fill.ec`](../master/SMC-fill.ec) omits the proof,
+allowing them to be filled-in.
 
 Fourth Example: Symmetric Encryption from Pseudorandom Functions
 --------------------------------------------------------------------
