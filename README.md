@@ -16,11 +16,11 @@ First Example: Simple Logic
 
 [`SimpLogic.ec`](../master/SimpLogic.ec) contains the proof of a lemma
 showing how universal quantification can be expressed in terms
-of existential quantification and negation. (The file 
+of existential quantification and negation. The file 
 [`SimpLogic-initial.ec`](../master/SimpLogic-initial.ec) contains
 a less sophisticated precursor to the final, terser proof. And the file
 [`SimpLogic-fill.ec`](../master/SimpLogic-fill.ec) omits the
-proofs, allowing them to be filled-in.)
+proofs, allowing them to be filled-in.
 
 Second Example: Random Assignment
 --------------------------------------------------------------------
