@@ -42,7 +42,7 @@ Real/Ideal Paradigm Style
 proof of two-party secure message communication via a one-time
 pad. This is done using the Real/Ideal Paradigm (but in a non-UC
 (Universally Composable Security) style). 
-The file [`SMC-fill.ec`](../master/SMC-fill.ec) omits the proof,
+The file [`SMC-fill.ec`](../master/SMC-fill.ec) omits the proofs,
 allowing them to be filled-in.
 
 Fourth Example: Symmetric Encryption from Pseudorandom Functions
