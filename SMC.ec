@@ -39,6 +39,12 @@ proof.
 by rewrite xorA xorK xor_0.
 qed.
 
+lemma xor_double_same_left (x y : bits) :
+  y ^^ y ^^ x = x.
+proof.
+by rewrite xorK xor0_.
+qed.
+
 (* uniform, full and lossless distribution on bitstrings *)
 
 op dbits : bits distr.
@@ -158,22 +164,20 @@ inline*.
 seq 1 1 : (={x, glob Adv}).
 call (_ : true).
 auto.
-seq 1 1 : (={x, glob Adv} /\ GReal.pad{1} ^^ x{1} = x0{2}).
-rnd (fun z => z ^^ x{1}).
+seq 1 1 : (={x, glob Adv} /\ x{1} ^^ GReal.pad{1} = x0{2}).
+rnd (fun z => x{1} ^^ z).
 auto => /> &2.
 split => [z _ | _].
-by rewrite xor_double_same_right.
+by rewrite -xorA xor_double_same_left.
 split => [z _ | _ z _].
 by rewrite 2!dbits1E.
 split => [| _].
 apply dbits_fu.
-by rewrite xor_double_same_right.
+by rewrite -xorA xor_double_same_left.
 call (_ : true).
 wp.
 call (_ : true).
 auto => /> &1 &2.
-split => [| _].
-by rewrite xorC.
 by rewrite xor_double_same_right.
 qed.
 
@@ -194,4 +198,3 @@ lemma Security (Adv <: ADV{GReal}) &m :
 proof.
 apply (Sec Adv &m).
 qed.
-

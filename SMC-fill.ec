@@ -39,6 +39,12 @@ proof.
 
 qed.
 
+lemma xor_double_same_left (x y : bits) :
+  y ^^ y ^^ x = x.
+proof.
+
+qed.
+
 (* uniform, full and lossless distribution on bitstrings *)
 
 op dbits : bits distr.
