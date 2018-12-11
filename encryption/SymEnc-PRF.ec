@@ -10,7 +10,6 @@ require export AllCore Distr DBool List SmtMap FSet Mu_mem.
 require import StdBigop. import Bigreal BRA.
 require import StdOrder. import RealOrder.
 require import StdRing. import RField.
-require import Aux.
 require BitWord FelTactic.
 
 (* require but don't import theories for symmetric encryption and
@@ -1057,8 +1056,8 @@ inline*; wp; sp.
 if => //.
 move => /> &1 &2 _ _ eq_exc ne_u_genc_inp.
 split => [u_in_dom_mp1 | u_in_dom_mp2].
-by apply (eq_except_ne_in EO_I.genc_inp{2} u{2} TRF.mp{1} TRF.mp{2}).
-rewrite (eq_except_ne_in EO_I.genc_inp{2} u{2} TRF.mp{2} TRF.mp{1})
+by apply (eq_except_notp_in (pred1 EO_I.genc_inp{2}) u{2} TRF.mp{1} TRF.mp{2}).
+rewrite (eq_except_notp_in (pred1 EO_I.genc_inp{2}) u{2} TRF.mp{2} TRF.mp{1})
         1:eq_except_sym //.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp not_mem_u_dom_mp1 z _.
 split.

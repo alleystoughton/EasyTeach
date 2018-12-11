@@ -19,7 +19,3 @@ of this scheme, reducing it to the security of the PRF. This proof
 illustates the use of the sequence of games approach, upto bad
 reasoning, and EasyCrypt's failure event lemma for upper-bounding the
 probability of a failure event holding.
-
-(The file [`Aux.ec`](Aux.ec) contains auxiliary lemmas that perhaps
-should be in the EasyCrypt Library.)
-
