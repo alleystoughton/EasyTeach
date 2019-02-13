@@ -393,23 +393,23 @@ local lemma EO_EO_RF_PRF_enc_pre :
   equiv[EO.enc_pre ~ EO_RF(PRF).enc_pre :
         ={x} /\ ={key}(EncO, PRF) /\ ={ctr_pre}(EncO, EO_RF) ==>
         ={res} /\ ={ctr_pre}(EncO, EO_RF)].
-proof.       
-proc; inline*; if => //; [wp; rnd; auto | auto].
-qed.
-
-local lemma EO_EO_RF_PRF_enc_post :
-  equiv[EO.enc_post ~ EO_RF(PRF).enc_post :
-        ={x} /\ ={key}(EncO, PRF) /\ ={ctr_post}(EncO, EO_RF) ==>
-        ={res} /\ ={ctr_post}(EncO, EO_RF)].
-proof.       
+proof.
 proc; inline*; if => //; [wp; rnd; auto | auto].
 qed.
 
 local lemma EO_EO_RF_PRF_genc :
   equiv[EO.genc ~ EO_RF(PRF).genc :
         ={x} /\ ={key}(EncO, PRF) ==> ={res}].
-proof.       
+proof.
 proc; inline*; wp; rnd; auto.
+qed.
+
+local lemma EO_EO_RF_PRF_enc_post :
+  equiv[EO.enc_post ~ EO_RF(PRF).enc_post :
+        ={x} /\ ={key}(EncO, PRF) /\ ={ctr_post}(EncO, EO_RF) ==>
+        ={res} /\ ={ctr_post}(EncO, EO_RF)].
+proof.
+proc; inline*; if => //; [wp; rnd; auto | auto].
 qed.
 
 local lemma INDCPA_G1_PRF &m :
