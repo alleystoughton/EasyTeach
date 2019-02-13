@@ -677,36 +677,32 @@ seq 1 1 :
     ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O))).
 call EO_RF_TRF_EO_O_genc.
 auto.
-exlim EO_RF.clash_pre{1} => clash_pre.
 call
   (_ :
-   ={clash_pre}(EO_RF, EO_O) /\ clash_pre = EO_RF.clash_pre{1} /\
+   ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
     ={glob Adv, c, TRF.mp} /\
     ={ctr_post, genc_inp}(EO_RF, EO_O)) ==>
    ={clash_pre}(EO_RF, EO_O) /\
-   (! EO_RF.clash_pre{1} => ! clash_pre /\
+   (! EO_RF.clash_pre{1} =>
     ={res} /\ ={TRF.mp} /\ ={ctr_post, genc_inp}(EO_RF, EO_O))).
 proc
   (EO_O.clash_pre)
   (={TRF.mp} /\
-   ={ctr_post, genc_inp, clash_pre}(EO_RF, EO_O) /\
-   !clash_pre)
+   ={ctr_post, genc_inp, clash_pre}(EO_RF, EO_O))
   (EO_RF.clash_pre{1}).
 by move => /> &1 &2 not_clash_imp /not_clash_imp.
 move => /> &1 &2.
 case (EO_O.clash_pre{2}) => />.
 apply Adv_guess_ll.
-conseq EO_RF_TRF_EO_O_enc_post.
-trivial.
-trivial.
+conseq EO_RF_TRF_EO_O_enc_post => //.
 progress; apply (EO_RF_TRF_enc_post_pres_clash_pre).
 progress; by conseq (EO_O_enc_post_pres_clash_pre).
 skip => /> &1 &2 not_clash_imp.
 split.
 move => /not_clash_imp //.
 move => _ result_L result_R ctr_post_L ml_L ctr_post_R mp_R
-        not_clash_imp'' /not_clash_imp'' //.
+        not_clash_imp' /not_clash_imp' //.
 qed.
 
 local lemma EO_O_enc_pre_pres_invar :
