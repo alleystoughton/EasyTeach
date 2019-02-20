@@ -371,24 +371,6 @@ local module G1 (RF : RF) = {
   }
 }.    
 
-local lemma EO_RF_TRF_enc_post_pres_clash_pre :
-  phoare[EO_RF(TRF).enc_post : EO_RF.clash_pre ==> EO_RF.clash_pre] = 1%r.
-proof.
-proc.
-if.
-seq 2 : (EO_RF.clash_pre).
-auto.
-auto; progress; by rewrite dtext_ll.
-if.
-wp; sp; inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
-qed.
-
 local lemma EO_EO_RF_PRF_enc_pre :
   equiv[EO.enc_pre ~ EO_RF(PRF).enc_pre :
         ={x} /\ ={key}(EncO, PRF) /\ ={ctr_pre}(EncO, EO_RF) ==>
@@ -528,7 +510,19 @@ local lemma EO_O_enc_pre_ll : islossless EO_O.enc_pre.
 proof.
 proc.
 if.
+seq 2 :
+  true  (* intermediate condition (IC) *)
+  1%r   (* probability of termination of 1st part with IC from
+           precondition  *)
+  1%r   (* probability of termination of 2nd part with post
+           condition from IC *)
+  0%r   (* probability of termination of 1st part with !IC from
+           precondition *)
+  1%r.  (* probability of termination of 2nd part with post
+           condition from !IC *)
+(* the above can be abbreviated to:
 seq 2 : true.
+*)
 auto.
 auto; progress; by rewrite dtext_ll.
 inline*; wp; sp; if; [auto; progress; by rewrite dtext_ll | auto].
@@ -568,6 +562,24 @@ trivial.
 auto.
 qed.
 
+local lemma EO_RF_TRF_enc_post_pres_clash_pre :
+  phoare[EO_RF(TRF).enc_post : EO_RF.clash_pre ==> EO_RF.clash_pre] = 1%r.
+proof.
+proc.
+if.
+seq 2 : (EO_RF.clash_pre).
+auto.
+auto; progress; by rewrite dtext_ll.
+if.
+wp; sp; inline*; wp; sp.
+if; [auto; progress; by rewrite dtext_ll | auto].
+inline*; wp; sp.
+if; [auto; progress; by rewrite dtext_ll | auto].
+hoare; auto.
+trivial.
+auto.
+qed.
+
 local lemma EO_RF_TRF_EO_O_enc_pre :
   equiv
   [EO_RF(TRF).enc_pre ~ EO_O.enc_pre :
@@ -596,18 +608,18 @@ local lemma EO_RF_TRF_EO_O_genc :
   equiv
   [EO_RF(TRF).genc ~ EO_O.genc :
    ={x, TRF.mp} /\
-   ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
+   ={clash_pre, genc_inp}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1} ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
     ={res, TRF.mp} /\
-    ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O))].
+    ={clash_pre, genc_inp}(EO_RF, EO_O))].
 proof.
 proc.
 seq 1 1 :
   (={x, u, TRF.mp} /\
-   ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
+   ={clash_pre, genc_inp}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 auto.
 if.
@@ -687,10 +699,10 @@ call
    (! EO_RF.clash_pre{1} =>
     ={res} /\ ={TRF.mp} /\ ={ctr_post, genc_inp}(EO_RF, EO_O))).
 proc
-  (EO_O.clash_pre)
-  (={TRF.mp} /\
+  (EO_O.clash_pre)  (* bad event in second game *)
+  (={TRF.mp} /\  (* when bad event is false *)
    ={ctr_post, genc_inp, clash_pre}(EO_RF, EO_O))
-  (EO_RF.clash_pre{1}).
+  (EO_RF.clash_pre{1}).  (* when bad event is true *)
 by move => /> &1 &2 not_clash_imp /not_clash_imp.
 move => /> &1 &2.
 case (EO_O.clash_pre{2}) => />.
@@ -721,7 +733,7 @@ split.
 split => [| _]; [by rewrite ltzS | by rewrite addzC lez_add1r].
 apply dtext_ll.
 inline*; wp; sp; if.
-rnd predT.
+rnd predT. (* rnd without an argument doesn't work! *)
 auto => /> &hr lt_card_dom_mp_ctr _ not_mem_u_dom_mp.
 split => [| _ y _ _]; first apply dtext_ll.
 by rewrite fdom_set fcardUI_indep 1:fsetI1 1:mem_fdom
