@@ -544,37 +544,14 @@ trivial.
 auto.
 qed.
 
-local lemma EO_O_enc_post_pres_clash_pre :
-  phoare[EO_O.enc_post : EO_O.clash_pre ==> EO_O.clash_pre] = 1%r.
+local lemma EO_RF_TRF_enc_post_ll : islossless EO_RF(TRF).enc_post.
 proof.
 proc.
 if.
-seq 2 : (EO_O.clash_pre).
+seq 2 : true.
 auto.
 auto; progress; by rewrite dtext_ll.
-if.
-wp; sp; inline*; sp; wp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
-qed.
-
-local lemma EO_RF_TRF_enc_post_pres_clash_pre :
-  phoare[EO_RF(TRF).enc_post : EO_RF.clash_pre ==> EO_RF.clash_pre] = 1%r.
-proof.
-proc.
-if.
-seq 2 : (EO_RF.clash_pre).
-auto.
-auto; progress; by rewrite dtext_ll.
-if.
-wp; sp; inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
+inline*; wp; sp; if; [auto; progress; by rewrite dtext_ll | auto].
 hoare; auto.
 trivial.
 auto.
@@ -608,18 +585,18 @@ local lemma EO_RF_TRF_EO_O_genc :
   equiv
   [EO_RF(TRF).genc ~ EO_O.genc :
    ={x, TRF.mp} /\
-   ={clash_pre, genc_inp}(EO_RF, EO_O) /\
+   ={clash_pre}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1} ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} =>
     ={res, TRF.mp} /\
-    ={clash_pre, genc_inp}(EO_RF, EO_O))].
+    ={genc_inp}(EO_RF, EO_O))].
 proof.
 proc.
 seq 1 1 :
   (={x, u, TRF.mp} /\
-   ={clash_pre, genc_inp}(EO_RF, EO_O) /\
+   ={clash_pre}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 auto.
 if.
@@ -707,9 +684,9 @@ by move => /> &1 &2 not_clash_imp /not_clash_imp.
 move => /> &1 &2.
 case (EO_O.clash_pre{2}) => />.
 apply Adv_guess_ll.
-conseq EO_RF_TRF_EO_O_enc_post => //.
-progress; apply (EO_RF_TRF_enc_post_pres_clash_pre).
-progress; by conseq (EO_O_enc_post_pres_clash_pre).
+by conseq EO_RF_TRF_EO_O_enc_post.
+progress; conseq EO_RF_TRF_enc_post_ll.
+progress; conseq EO_O_enc_post_ll.
 skip => /> &1 &2 not_clash_imp.
 split.
 move => /not_clash_imp //.
