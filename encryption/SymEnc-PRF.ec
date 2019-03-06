@@ -616,7 +616,8 @@ local lemma EO_RF_TRF_EO_O_enc_post :
 proof.
 proc.
 if => //.
-seq 2 2 : (={x, u} /\ ={TRF.mp} /\ ={ctr_post, genc_inp}(EO_RF, EO_O)).
+seq 2 2 :
+  (={x, u} /\ ={TRF.mp} /\ ={ctr_post, genc_inp}(EO_RF, EO_O)).
 auto.
 if => //.
 wp; sp; inline*; wp; sp.
@@ -666,15 +667,16 @@ auto.
 call
   (_ :
    ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   (! EO_RF.clash_pre{1} => ={glob Adv, c, TRF.mp}) ==>
+   ={glob Adv} /\
+   (! EO_RF.clash_pre{1} => ={c, TRF.mp}) ==>
    (! EO_RF.clash_pre{1} => ={res})).
 proc
   (EO_O.clash_pre)  (* bad event in second game *)
   (={TRF.mp} /\  (* when bad event is false *)
    ={ctr_post, genc_inp, clash_pre}(EO_RF, EO_O))
   (EO_RF.clash_pre{1}).  (* when bad event is true *)
-by move => /> &1 &2 not_clash_imp /not_clash_imp.
-move => /> &1 &2.
+by move => />.
+move => &1 &2.
 by case (EO_O.clash_pre{2}).
 apply Adv_guess_ll.
 by conseq EO_RF_TRF_EO_O_enc_post.
