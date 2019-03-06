@@ -675,7 +675,7 @@ proc
   (EO_RF.clash_pre{1}).  (* when bad event is true *)
 by move => /> &1 &2 not_clash_imp /not_clash_imp.
 move => /> &1 &2.
-case (EO_O.clash_pre{2}) => />.
+by case (EO_O.clash_pre{2}).
 apply Adv_guess_ll.
 by conseq EO_RF_TRF_EO_O_enc_post.
 progress; conseq EO_RF_TRF_enc_post_ll.
