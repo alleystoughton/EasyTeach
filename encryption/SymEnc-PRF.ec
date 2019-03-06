@@ -735,14 +735,12 @@ conseq
 move => /> &hr le_card_dom_mp_ctr le_ctr_limit _.
 by apply (lez_trans EO_O.ctr_pre{hr}).
 wp; simplify.
-rnd (mem (fdom TRF.mp)).
-auto => /> &hr le_card_dom_mp_limit not_clash.
-split => [| _ x _ contrad].
+conseq (_ : _ ==> mem (fdom TRF.mp) u).
+move => /> &hr le_card_dom_mp_limit _ u0.
+by rewrite mem_fdom.
+rnd; simplify; skip => &hr [#] le_card_dom_mp_limit _.
 by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0
            1:le_fromint 1:ltzW 1:powPos // le_fromint.
-case (x \in fdom TRF.mp{hr}) => // x_notin_dom_mp.
-rewrite mem_fdom in x_notin_dom_mp.
-trivial.
 conseq (_ : _ ==> _ : = (1%r)).
 auto; progress; by rewrite dtext_ll.
 hoare; inline*; auto; progress.
