@@ -584,14 +584,11 @@ qed.
 local lemma EO_RF_TRF_EO_O_genc :
   equiv
   [EO_RF(TRF).genc ~ EO_O.genc :
-   ={x, TRF.mp} /\
-   ={clash_pre}(EO_RF, EO_O) /\
+   ={x, TRF.mp} /\ ={clash_pre}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1} ==>
-   ={clash_pre}(EO_RF, EO_O) /\
-   (! EO_RF.clash_pre{1} =>
-    ={res, TRF.mp} /\
-    ={genc_inp}(EO_RF, EO_O))].
+   ={clash_pre, genc_inp}(EO_RF, EO_O) /\
+   (! EO_RF.clash_pre{1} => ={res, TRF.mp})].
 proof.
 proc.
 seq 1 1 :
@@ -645,7 +642,7 @@ seq 1 1 :
 inline*; auto; progress; by rewrite fdom0.
 seq 1 1 :
   (={x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
+   ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 call
   (_ :
@@ -660,21 +657,17 @@ seq 1 1 :
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 auto.
 seq 1 1 :
-  (={b, x1, x2} /\ ={clash_pre}(EO_RF, EO_O) /\
-   (! EO_RF.clash_pre{1} =>
-    ={c, TRF.mp, glob Adv} /\
-    ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O))).
+  (={b} /\
+   ={ctr_post, clash_pre, clash_post, genc_inp,
+     glob Adv}(EO_RF, EO_O) /\
+   (! EO_RF.clash_pre{1} => ={c, TRF.mp})).
 call EO_RF_TRF_EO_O_genc.
 auto.
 call
   (_ :
-   ={clash_pre}(EO_RF, EO_O) /\
-   (! EO_RF.clash_pre{1} =>
-    ={glob Adv, c, TRF.mp} /\
-    ={ctr_post, genc_inp}(EO_RF, EO_O)) ==>
-   ={clash_pre}(EO_RF, EO_O) /\
-   (! EO_RF.clash_pre{1} =>
-    ={res} /\ ={TRF.mp} /\ ={ctr_post, genc_inp}(EO_RF, EO_O))).
+   ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
+   (! EO_RF.clash_pre{1} => ={glob Adv, c, TRF.mp}) ==>
+   (! EO_RF.clash_pre{1} => ={res})).
 proc
   (EO_O.clash_pre)  (* bad event in second game *)
   (={TRF.mp} /\  (* when bad event is false *)
@@ -687,11 +680,7 @@ apply Adv_guess_ll.
 by conseq EO_RF_TRF_EO_O_enc_post.
 progress; conseq EO_RF_TRF_enc_post_ll.
 progress; conseq EO_O_enc_post_ll.
-skip => /> &1 &2 not_clash_imp.
-split.
-move => /not_clash_imp //.
-move => _ result_L result_R ctr_post_L ml_L ctr_post_R mp_R
-        not_clash_imp' /not_clash_imp' //.
+skip => /> &1 &2 _ result_L result_R not_clash_imp /not_clash_imp //.
 qed.
 
 local lemma EO_O_enc_pre_pres_invar :
