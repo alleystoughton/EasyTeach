@@ -737,7 +737,7 @@ conseq
 move => /> &hr le_card_dom_mp_ctr le_ctr_limit _.
 by apply (lez_trans EO_O.ctr_pre{hr}).
 wp; simplify.
-conseq (_ : _ ==> mem (fdom TRF.mp) u).
+conseq (_ : _ ==> u \in fdom TRF.mp).
 move => /> &hr le_card_dom_mp_limit _ u0.
 by rewrite mem_fdom.
 rnd; simplify; skip => &hr [#] le_card_dom_mp_limit _.
@@ -755,7 +755,7 @@ local lemma G2_main_clash_ub &m :
 proof.
 byphoare => //.
 proc.
-seq 1 :
+seq 3 :
   (card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre)
   (1%r)
   (limit_pre%r / (2 ^ text_len)%r)
@@ -764,37 +764,14 @@ seq 1 :
 last 2 first.
 hoare.
 inline*; auto.
+call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
+conseq (_ : _ ==> _ : = (1%r)) => //.
+conseq EO_O_enc_pre_pres_invar => //.
+auto => />.
 rewrite fdom0 fcards0 /= ge0_limit_pre.
 trivial.
 inline*; auto.
 inline*; auto.
-seq 2 :
-  (card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre)
-  (1%r)
-  (limit_pre%r / (2 ^ text_len)%r)
-  (0%r)
-  (1%r);
-last 2 first.
-hoare.
-rnd.
-call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
-conseq (_ : _ ==> _ : = (1%r)) => //.
-conseq EO_O_enc_pre_pres_invar => //.
-auto.
-trivial.
-rnd.
-simplify.
-conseq (_ : true ==> true).
-call (_ : true).
-conseq (_ : _ ==> true : = (1%r)) => //.
-apply EO_O_enc_pre_ll.
-auto.
-rnd.
-conseq (_ : _ ==> _ : = (1%r)).
-call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
-apply Adv_choose_ll.
-conseq EO_O_enc_pre_pres_invar => //.
-auto.
 seq 1 :
   (EO_O.clash_pre)
   (limit_pre%r / (2 ^ text_len)%r)
@@ -829,10 +806,10 @@ byequiv
   (_ :
    true ==>
    (={clash_pre}(EO_RF, EO_O)) /\ (! EO_O.clash_pre{2} => ={res})) :
-  (EO_RF.clash_pre) => //; last first.
+  (EO_RF.clash_pre) => //.
+by conseq G1_TRF_G2_main.
 move => &1 &2 [#] -> not_class_imp /=.
 by rewrite -eq_iff.
-by conseq G1_TRF_G2_main.
 qed.
 
 (* now we use triangular inequality
