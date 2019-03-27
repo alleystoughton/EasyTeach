@@ -984,22 +984,20 @@ wp; sp.
 inline*; wp; sp.
 if{1}; auto.
 if{2}; auto.
-progress.
-rewrite dtext_ll.
-rewrite eq_exceptP /pred1 in H1.
-rewrite eq_exceptP => x; rewrite /pred1 => ne_x_genc_inp.
-by rewrite get_set_neqE // get_set_neqE // H1.
-progress.
-rewrite dtext_ll.
-rewrite eq_exceptP /pred1 in H1.
-rewrite eq_exceptP => x; rewrite /pred1 => ne_x_genc_inp.
-by rewrite get_set_neqE // H1.
+move => /> &1 &2 ? _ _ eq_exc _ _.
+split => [| _ x _ y _]; first rewrite dtext_ll.
+rewrite eq_exceptP /pred1 in eq_exc.
+rewrite eq_exceptP => z; rewrite /pred1 => ne_z_genc_inp.
+by rewrite get_set_neqE // get_set_neqE // eq_exc.
+move => /> &1 &2 ? _ _ eq_exc _ _.
+split => [| _ x _]; first rewrite dtext_ll.
+rewrite eq_exceptP => y; rewrite /pred1 => ne_y_genc_inp.
+by rewrite get_set_neqE // eq_exc.
 if{2}; auto.
-progress.
-rewrite dtext_ll.
-rewrite eq_exceptP /pred1 in H1.
-rewrite eq_exceptP => x; rewrite /pred1 => ne_x_genc_inp.
-by rewrite get_set_neqE // H1.
+move => /> &1 &2 ? _ _ eq_exc _ _.
+split => [| _ x _]; first rewrite dtext_ll.
+rewrite eq_exceptP => y; rewrite /pred1 => ne_y_genc_inp.
+by rewrite get_set_neqE // eq_exc.
 inline*; wp; sp.
 if => //.
 move => /> &1 &2 _ _ eq_exc ne_u_genc_inp.
@@ -1008,8 +1006,7 @@ by apply (eq_except_notp_in (pred1 EO_I.genc_inp{2}) u{2} TRF.mp{1} TRF.mp{2}).
 rewrite (eq_except_notp_in (pred1 EO_I.genc_inp{2}) u{2} TRF.mp{2} TRF.mp{1})
         1:eq_except_sym //.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp not_mem_u_dom_mp1 z _.
-split.
-by rewrite eq_except_set_eq.
+split; first by rewrite eq_except_set_eq.
 congr; by rewrite 2!get_set_sameE.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp _.
 congr.
