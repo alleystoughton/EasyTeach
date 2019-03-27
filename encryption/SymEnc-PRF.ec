@@ -427,7 +427,7 @@ by rewrite (INDCPA_G1_PRF &m) (G1_GRF PRF &m) (G1_GRF TRF &m).
 qed.
 
 (* version of encryption oracle using TRF, and where genc
-   (obliviously) updates TRF.mp with randomly chosen u even if
+   (Obliviously) updates TRF.mp with randomly chosen u even if
    clash_pre has happened *)
 
 local module EO_O : EO = {
@@ -831,7 +831,7 @@ rewrite
 qed.
 
 (* version of encryption oracle in which genc doesn't update TRF.mp at
-   all (I for independent) *)
+   all (I for Independent of map) *)
 
 local module EO_I : EO = {
   var ctr_pre : int
@@ -968,9 +968,8 @@ local lemma EO_O_EO_I_enc_post :
         !EO_O.clash_post{1} /\
         eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2} ==>
         ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
-        (!EO_O.clash_post{1} =>
-         ={res} /\
-         eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2})].
+        eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2} /\
+        (!EO_O.clash_post{1} => ={res})].
 proof.
 proc.
 if => //.
@@ -985,10 +984,22 @@ wp; sp.
 inline*; wp; sp.
 if{1}; auto.
 if{2}; auto.
-progress; rewrite dtext_ll.
-progress; rewrite dtext_ll.
+progress.
+rewrite dtext_ll.
+rewrite eq_exceptP /pred1 in H1.
+rewrite eq_exceptP => x; rewrite /pred1 => ne_x_genc_inp.
+by rewrite get_set_neqE // get_set_neqE // H1.
+progress.
+rewrite dtext_ll.
+rewrite eq_exceptP /pred1 in H1.
+rewrite eq_exceptP => x; rewrite /pred1 => ne_x_genc_inp.
+by rewrite get_set_neqE // H1.
 if{2}; auto.
-progress; rewrite dtext_ll.
+progress.
+rewrite dtext_ll.
+rewrite eq_exceptP /pred1 in H1.
+rewrite eq_exceptP => x; rewrite /pred1 => ne_x_genc_inp.
+by rewrite get_set_neqE // H1.
 inline*; wp; sp.
 if => //.
 move => /> &1 &2 _ _ eq_exc ne_u_genc_inp.
@@ -998,12 +1009,12 @@ rewrite (eq_except_notp_in (pred1 EO_I.genc_inp{2}) u{2} TRF.mp{2} TRF.mp{1})
         1:eq_except_sym //.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp not_mem_u_dom_mp1 z _.
 split.
-congr; by rewrite 2!get_set_sameE.
 by rewrite eq_except_set_eq.
-auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp u_not_in_dom_mp1.
-congr; congr.
+congr; by rewrite 2!get_set_sameE.
+auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp _.
+congr.
 rewrite eq_exceptP in eq_exc.
-by rewrite eq_exc /pred1.
+by rewrite eq_exc.
 auto.
 qed.
 
@@ -1038,7 +1049,6 @@ seq 1 1 :
    ={ctr_post, clash_post}(EO_O, EO_I) /\
    !EO_O.clash_post{1} /\ ={genc_inp}(EO_O, EO_I) /\ 
    eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}).
-print EO_O_EO_I_genc.
 call EO_O_EO_I_genc; first auto.
 call
   (_ :
@@ -1159,11 +1169,12 @@ rewrite
   1:ler_dist_add mulrDl addrA ler_add 1:(INDCPA_G2 &m) (G2_G3 &m).
 qed.
 
-(* version of encryption oracle in which right side of
-   ciphertext produced by genc doesn't reference plaintext
-   at all; we no longer need any instrumentation *)
+(* version of encryption oracle in which right side of ciphertext
+   produced by genc doesn't reference plaintext at all (N stands for
+   No reference to plaintext); we no longer need any
+   instrumentation *)
 
-local module EO_R : EO = {
+local module EO_N : EO = {
   var ctr_pre : int
   var ctr_post : int
 
@@ -1209,25 +1220,25 @@ local module EO_R : EO = {
   }
 }.
 
-(* game using EO_R, and where argument to EO_R.genc is independent
+(* game using EO_N, and where argument to EO_N.genc is independent
    from x1/x2/b *)
 
 local module G4 = {
-  module A = Adv(EO_R)
+  module A = Adv(EO_N)
 
   proc main() : bool = {
     var b, b' : bool; var x1, x2 : text; var c : cipher;
-    EO_R.init();
+    EO_N.init();
     (x1, x2) <@ A.choose();
     b <$ {0,1};
-    c <@ EO_R.genc(text0);
+    c <@ EO_N.genc(text0);
     b' <@ A.guess(c);
     return b = b';
   }
 }.    
 
-local lemma EO_R_enc_pre_ll :
-  phoare[EO_R.enc_pre : true ==> true] = 1%r.
+local lemma EO_N_enc_pre_ll :
+  phoare[EO_N.enc_pre : true ==> true] = 1%r.
 proof.
 proc.
 if.
@@ -1241,8 +1252,8 @@ trivial.
 auto.
 qed.
 
-local lemma EO_R_enc_post_ll :
-  phoare[EO_R.enc_post : true ==> true] = 1%r.
+local lemma EO_N_enc_post_ll :
+  phoare[EO_N.enc_post : true ==> true] = 1%r.
 proof.
 proc.
 if.
@@ -1256,16 +1267,16 @@ trivial.
 auto.
 qed.
 
-local lemma EO_R_genc_ll :
-  phoare[EO_R.genc : true ==> true] = 1%r.
+local lemma EO_N_genc_ll :
+  phoare[EO_N.genc : true ==> true] = 1%r.
 proof.
 proc; auto; progress; by rewrite dtext_ll.
 qed.
 
 (* note no assumption about genc's argument, x *)
 
-local lemma EO_I_EO_R_genc :
-  equiv[EO_I.genc ~ EO_R.genc :
+local lemma EO_I_EO_N_genc :
+  equiv[EO_I.genc ~ EO_N.genc :
         true ==> ={res}].
 proof.
 proc.
@@ -1283,16 +1294,16 @@ local lemma G3_G4 &m :
 proof.
 byequiv => //.
 proc.
-seq 1 1 : (={TRF.mp} /\ ={ctr_pre, ctr_post}(EO_I, EO_R)).
+seq 1 1 : (={TRF.mp} /\ ={ctr_pre, ctr_post}(EO_I, EO_N)).
 inline*; auto.
 seq 1 1 :
-  (={x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_R)); first sim.
+  (={x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_N)); first sim.
 seq 1 1 :
-  (={b, x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_R)).
+  (={b, x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_N)).
 auto.
 seq 1 1 :
-  (={c, b, x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_R)).
-call EO_I_EO_R_genc; first auto.
+  (={c, b, x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_N)).
+call EO_I_EO_N_genc; first auto.
 sim.
 qed.
 
@@ -1313,10 +1324,10 @@ proof.
 byphoare => //; proc.
 swap 3 2; rnd.
 call (_ : true);
-  [apply Adv_guess_ll | apply EO_R_enc_post_ll | idtac].
-call EO_R_genc_ll.
+  [apply Adv_guess_ll | apply EO_N_enc_post_ll | idtac].
+call EO_N_genc_ll.
 call (_ : true);
-  [apply Adv_choose_ll | apply EO_R_enc_pre_ll | idtac].
+  [apply Adv_choose_ll | apply EO_N_enc_pre_ll | idtac].
 inline*; auto => /= x; by rewrite dbool1E.
 qed.
 
