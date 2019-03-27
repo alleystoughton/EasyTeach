@@ -279,7 +279,9 @@ declare module Adv : ADV{EncO, PRF, TRF, Adv2RFA}.
 
 (* axiomatize losslessness (termination for all arguments) of Adv's
    procedures, for all encryption oracles whose accessible procedures
-   are themselves lossless *)
+   are themselves lossless
+
+   this is required for us to use upto bad reasoning *)
 
 axiom Adv_choose_ll :
   forall (EO <: EO{Adv}),
