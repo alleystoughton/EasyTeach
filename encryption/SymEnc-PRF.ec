@@ -830,8 +830,8 @@ rewrite
   1:ler_dist_add (INDCPA_G1_TRF &m) ler_add2l (G1_TRF_G2 &m).
 qed.
 
-(* version of encryption oracle in which genc doesn't update
-   TRF.mp at all *)
+(* version of encryption oracle in which genc doesn't update TRF.mp at
+   all (I for independent) *)
 
 local module EO_I : EO = {
   var ctr_pre : int
@@ -967,10 +967,9 @@ local lemma EO_O_EO_I_enc_post :
         ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
         !EO_O.clash_post{1} /\
         eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2} ==>
-        ={clash_post}(EO_O, EO_I) /\
+        ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
         (!EO_O.clash_post{1} =>
          ={res} /\
-         ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
          eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2})].
 proof.
 proc.
@@ -983,7 +982,6 @@ seq 2 2 :
 auto; progress; by rewrite -ltzE.
 if => //.
 wp; sp.
-elim* => clash_post_R clash_post_L.
 inline*; wp; sp.
 if{1}; auto.
 if{2}; auto.
@@ -1040,6 +1038,7 @@ seq 1 1 :
    ={ctr_post, clash_post}(EO_O, EO_I) /\
    !EO_O.clash_post{1} /\ ={genc_inp}(EO_O, EO_I) /\ 
    eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}).
+print EO_O_EO_I_genc.
 call EO_O_EO_I_genc; first auto.
 call
   (_ :
@@ -1066,8 +1065,8 @@ apply EO_O_enc_post_pres_clash_post.
 progress.
 conseq (EO_I_enc_post_pres_clash_post) => //.
 auto => /> &1 &2.
-move => not_clash res_L res_R clash_R clash_post_R
-        not_clash_R_imp /not_clash_R_imp -> //.
+move => _ _ res_L res_R clash_R not_clash_R_imp
+        /not_clash_R_imp -> //.
 qed.
 
 (* use failure event lemma tactic (fel) to upper bound probability
@@ -1099,7 +1098,7 @@ by rewrite sumr_const intmulr /= count_predT size_range
 inline*; auto; progress; rewrite ge0_limit_post.
 (* 3 *)
 proc; rcondt 1; first auto.
-wp; sp; elim* => ctr_post.
+wp; sp.
 seq 2 :
   (EO_I.clash_post)
   (1%r / (2 ^ text_len)%r)
@@ -1109,7 +1108,7 @@ seq 2 :
 auto.
 wp.
 rnd (pred1 EO_I.genc_inp).
-auto => /> &hr _ _ not_clash _.
+auto => /> &hr _.
 by rewrite mu1_dtext.
 inline*; wp; sp; if; auto.
 hoare; inline*; wp; sp; if; auto.
@@ -1271,13 +1270,12 @@ local lemma EO_I_EO_R_genc :
 proof.
 proc.
 wp.
-rnd (fun z => z +^ x{1}).
+rnd (fun z => x{1} +^ z).
 auto; progress.
-by rewrite -text_xorA text_xorK text_xor_rid.
+by rewrite text_xorA text_xorK text_xor_lid.
 by rewrite 2!mu1_dtext.
 rewrite dtext_fu.
-by rewrite -text_xorA text_xorK text_xor_rid.
-by rewrite text_xorC.
+by rewrite text_xorA text_xorK text_xor_lid.
 qed.
 
 local lemma G3_G4 &m :
