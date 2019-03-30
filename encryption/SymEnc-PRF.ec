@@ -61,20 +61,16 @@ op (+^) : text -> text -> text = Text.(+^).  (* bitwise exclusive or *)
 lemma text_xorK (x : text) : x +^ x = text0.
 proof. apply Text.xorwK. qed.
 
-lemma text_xorA (x y z : text) :
-  x +^ (y +^ z) = x +^ y +^ z.
+lemma text_xorA (x y z : text) : x +^ (y +^ z) = x +^ y +^ z.
 proof. apply Text.xorwA. qed.
 
-lemma text_xorC (x y : text) :
-  x +^ y = y +^ x.
+lemma text_xorC (x y : text) : x +^ y = y +^ x.
 proof. apply Text.xorwC. qed.
 
-lemma text_xor_rid (x : text) :
-  x +^ text0 = x.
+lemma text_xor_rid (x : text) : x +^ text0 = x.
 proof. apply Text.xorw0. qed.
 
-lemma text_xor_lid (x : text) :
-  text0 +^ x = x.
+lemma text_xor_lid (x : text) : text0 +^ x = x.
 proof. by rewrite Text.xorwC text_xor_rid. qed.
 
 (* full/uniform/lossless distribution *)
@@ -90,8 +86,7 @@ proof. apply Text.DWord.dunifin_uni. qed.
 lemma dtext_ll : is_lossless dtext.
 proof. apply Text.DWord.dunifin_ll. qed.
 
-lemma mu1_dtext (x : text) :
-  mu1 dtext x = 1%r / (2 ^ text_len)%r.
+lemma mu1_dtext (x : text) : mu1 dtext x = 1%r / (2 ^ text_len)%r.
 proof. by rewrite Text.DWord.dunifin1E Text.word_card. qed.
 
 lemma mu_dtext_mem (xs : text fset) :
@@ -174,14 +169,12 @@ module Enc : ENC = {
 
 (* prove encryption scheme is stateless *)
 
-lemma enc_stateless (g1 g2 : glob Enc) :
-  g1 = g2.
+lemma enc_stateless (g1 g2 : glob Enc) : g1 = g2.
 proof. trivial. qed.
 
 (* lemma proving correctness of encryption *)
 
-lemma correctness :
-  phoare[Cor(Enc).main : true ==> res] = 1%r.
+lemma correctness : phoare[Cor(Enc).main : true ==> res] = 1%r.
 proof.
 proc; inline*; auto; progress.
 apply dkey_ll.
@@ -265,7 +258,7 @@ module Adv2RFA(Adv : ADV, RF : RF) = {
 (* see after section for security theorem
 
    in the proof, we connect the INDCPA game to a game that returns
-   true with probability 1/2, via a sequence of 4 intermediate
+   true with probability 1/2, via a sequence of 3 intermediate
    games *)
 
 section.
@@ -510,53 +503,17 @@ local module G2 = {
 
 local lemma EO_O_enc_pre_ll : islossless EO_O.enc_pre.
 proof.
-proc.
-if.
-seq 2 :
-  true  (* intermediate condition (IC) *)
-  1%r   (* probability of termination of 1st part with IC from
-           precondition  *)
-  1%r   (* probability of termination of 2nd part with post
-           condition from IC *)
-  0%r   (* probability of termination of 1st part with !IC from
-           precondition *)
-  1%r.  (* probability of termination of 2nd part with post
-           condition from !IC *)
-(* the above can be abbreviated to:
-seq 2 : true.
-*)
-auto.
-auto; progress; by rewrite dtext_ll.
-inline*; wp; sp; if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
+proc; islossless; by rewrite dtext_ll.
 qed.
 
 local lemma EO_O_enc_post_ll : islossless EO_O.enc_post.
 proof.
-proc.
-if.
-seq 2 : true.
-auto.
-auto; progress; by rewrite dtext_ll.
-inline*; wp; sp; if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
+proc; islossless; by rewrite dtext_ll.
 qed.
 
 local lemma EO_RF_TRF_enc_post_ll : islossless EO_RF(TRF).enc_post.
 proof.
-proc.
-if.
-seq 2 : true.
-auto.
-auto; progress; by rewrite dtext_ll.
-inline*; wp; sp; if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
+proc; islossless; by rewrite dtext_ll.
 qed.
 
 local lemma EO_RF_TRF_EO_O_enc_pre :
@@ -594,8 +551,7 @@ local lemma EO_RF_TRF_EO_O_genc :
 proof.
 proc.
 seq 1 1 :
-  (={x, u, TRF.mp} /\
-   ={clash_pre}(EO_RF, EO_O) /\
+  (={x, u, TRF.mp} /\ ={clash_pre}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
 auto.
 if.
@@ -618,14 +574,10 @@ local lemma EO_RF_TRF_EO_O_enc_post :
 proof.
 proc.
 if => //.
-seq 2 2 :
-  (={x, u} /\ ={TRF.mp} /\ ={ctr_post, genc_inp}(EO_RF, EO_O)).
+wp.
+call (_ : ={TRF.mp}).
+sim.
 auto.
-if => //.
-wp; sp; inline*; wp; sp.
-if => //; auto.
-wp; inline*; wp; sp.
-if => //; auto.
 auto.
 qed.
 
@@ -637,28 +589,20 @@ local lemma G1_TRF_G2_main :
    (! EO_RF.clash_pre{1} => ={res})].
 proof.
 proc.
-seq 1 1 :
+seq 3 3 :
   (={TRF.mp} /\
+   ={x1, x2, b, glob Adv} /\
    ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1} /\
    !EO_RF.clash_pre{1}).
-inline*; auto; progress; by rewrite fdom0.
-seq 1 1 :
-  (={x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
+rnd.
 call
   (_ :
    ={TRF.mp} /\
-   ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
+   ={ctr_pre, clash_pre}(EO_RF, EO_O) /\
    EO_RF.inps_pre{1} = fdom TRF.mp{1}).
 by conseq EO_RF_TRF_EO_O_enc_pre.
-auto.
-seq 1 1 :
-  (={b, x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_post, clash_pre, clash_post, genc_inp}(EO_RF, EO_O) /\
-   EO_RF.inps_pre{1} = fdom TRF.mp{1} /\ !EO_RF.clash_pre{1}).
-auto.
+inline*; auto; progress; by rewrite fdom0.
 seq 1 1 :
   (={b} /\
    ={ctr_post, clash_pre, clash_post, genc_inp,
@@ -696,12 +640,25 @@ local lemma EO_O_enc_pre_pres_invar :
 proof.
 proc.
 if.
-seq 2 : (card (fdom TRF.mp) < EO_O.ctr_pre <= limit_pre).
+seq 2 :
+  (* intermediate condition (IC) *)
+  (card (fdom TRF.mp) < EO_O.ctr_pre <= limit_pre)
+  1%r   (* probability of termination of 1st part with IC from
+           precondition  *)
+  1%r   (* probability of termination of 2nd part with post
+           condition from IC *)
+  0%r   (* probability of termination of 1st part with !IC from
+           precondition *)
+  1%r.  (* probability of termination of 2nd part with post
+           condition from !IC *)
+(* the above can be abbreviated:
+seq 2 : (card (fdom TRF.mp) < EO_O.ctr_pre <= limit_pre)
+*)
 auto.
-rnd; auto => /> &hr le_card_dom_mp_ctr _ _.
-split.
-split => [| _]; [by rewrite ltzS | by rewrite addzC lez_add1r].
-apply dtext_ll.
+rnd; auto; progress;
+  [by rewrite ltzS |
+   by rewrite addzC lez_add1r |
+   apply dtext_ll].
 inline*; wp; sp; if.
 rnd predT. (* rnd without an argument doesn't work! *)
 auto => /> &hr lt_card_dom_mp_ctr _ not_mem_u_dom_mp.
@@ -710,7 +667,7 @@ by rewrite fdom_set fcardUI_indep 1:fsetI1 1:mem_fdom
            1:not_mem_u_dom_mp // fcard1 addzC lez_add1r.
 auto; progress; by rewrite ltzW.
 hoare; simplify.
-rnd; auto => /> &hr le_card_dom_mp_ctr _ _ lt_ctr_limit u.
+rnd; auto => /> &hr le_card_dom_mp_ctr _ _ _ _.
 split => [| _]; [by rewrite ltzS | by rewrite addzC lez_add1r].
 trivial.
 auto.
@@ -742,7 +699,7 @@ wp; simplify.
 conseq (_ : _ ==> u \in fdom TRF.mp).
 move => /> &hr le_card_dom_mp_limit _ u0.
 by rewrite mem_fdom.
-rnd; simplify; skip => &hr [#] le_card_dom_mp_limit _.
+rnd; simplify; skip; progress.
 by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0
            1:le_fromint 1:ltzW 1:powPos // le_fromint.
 auto; progress; by rewrite dtext_ll.
@@ -765,9 +722,9 @@ seq 3 :
 last 2 first.
 hoare.
 inline*; auto.
-call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre /\ !EO_O.clash_pre).
+call (_ : card (fdom TRF.mp) <= EO_O.ctr_pre <= limit_pre).
 conseq (_ : _ ==> _ : = (1%r)) => //.
-conseq EO_O_enc_pre_pres_invar => //.
+apply EO_O_enc_pre_pres_invar.
 auto => />.
 rewrite fdom0 fcards0 /= ge0_limit_pre.
 trivial.
@@ -1024,31 +981,16 @@ local lemma G2_G3_main :
    ={clash_post}(EO_O, EO_I) /\ (! EO_O.clash_post{1} => ={res})].
 proof.
 proc.
-seq 1 1 :
-  (={TRF.mp} /\
-   ={ctr_pre, ctr_post, clash_pre, clash_post, genc_inp}(EO_O, EO_I) /\
-   !EO_O.clash_post{1}).
-inline*; auto; progress.
-seq 1 1 :
-  (={x1, x2, TRF.mp, glob Adv} /\
-   ={ctr_pre, ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
-   !EO_O.clash_post{1}).
-call
-  (_ :
-   (={TRF.mp} /\
-    ={ctr_pre, ctr_post, clash_post, genc_inp}(EO_O, EO_I))).
-sim.
-auto.
-seq 1 1 :
-  (={b, x1, x2, TRF.mp, glob Adv} /\
+seq 4 4 :
+  (={c, b, x1, x2, glob Adv} /\
    ={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
-   !EO_O.clash_post{1}); first auto.
-seq 1 1 :
-  (={c, b, glob Adv} /\
-   ={ctr_post, clash_post}(EO_O, EO_I) /\
-   !EO_O.clash_post{1} /\ ={genc_inp}(EO_O, EO_I) /\ 
+   !EO_O.clash_post{1} /\
    eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}).
-call EO_O_EO_I_genc; first auto.
+call EO_O_EO_I_genc.
+rnd.
+call (_ : (={TRF.mp} /\ ={ctr_pre}(EO_O, EO_I))).
+sim.
+inline*; auto.
 call
   (_ :
    ={c, glob Adv} /\
@@ -1061,25 +1003,26 @@ proc
   (EO_I.clash_post)
   (={ctr_post, clash_post, genc_inp}(EO_O, EO_I) /\
    eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2})
-  (EO_O.clash_post{1}).
-trivial.
+  (EO_O.clash_post{1}) => //.
 move => &1 &2.
 case (EO_I.clash_post{2}) => [_ -> // | //].
 apply Adv_guess_ll.
-conseq EO_O_EO_I_enc_post.
-trivial.
+conseq EO_O_EO_I_enc_post => //.
 by move => />.
-progress.
-apply EO_O_enc_post_pres_clash_post.
-progress.
-conseq (EO_I_enc_post_pres_clash_post) => //.
+progress; apply EO_O_enc_post_pres_clash_post.
+progress; conseq (EO_I_enc_post_pres_clash_post) => //.
 auto => /> &1 &2.
 move => _ _ res_L res_R clash_R not_clash_R_imp
         /not_clash_R_imp -> //.
 qed.
 
 (* use failure event lemma tactic (fel) to upper bound probability
-   that G2.main results in failure event being set *)
+   that G2.main results in failure event being set
+
+   fel is applicable because, after initialization of the counter
+   (EO_I.ctr_post), failure event (EO_I.clash_post) and invariant
+   (EO_I.ctr_post < limit_post) by line 1 of G3.main, it's only
+   EO_I.clash_post that's capable of setting the failure event *)
 
 local lemma G3_main_clash_ub &m :
   Pr[G3.main() @ &m : EO_I.clash_post] <= limit_post%r / (2 ^ text_len)%r.
@@ -1147,10 +1090,10 @@ byequiv
   (_ :
    true ==>
    (={clash_post}(EO_O, EO_I)) /\ (! EO_I.clash_post{2} => ={res})) :
-  (EO_O.clash_post) => //; last first.
+  (EO_O.clash_post) => //.
+by conseq G2_G3_main.
 move => &1 &2 [#] -> not_class_imp /=.
 by rewrite -eq_iff.
-by conseq G2_G3_main.
 qed.
 
 (* now we use triangular inequality to summarize: *)
@@ -1236,47 +1179,25 @@ local module G4 = {
   }
 }.    
 
-local lemma EO_N_enc_pre_ll :
-  phoare[EO_N.enc_pre : true ==> true] = 1%r.
+local lemma EO_N_enc_pre_ll : islossless EO_N.enc_pre.
 proof.
-proc.
-if.
-seq 2 : true.
-auto.
-auto; progress; by rewrite dtext_ll.
-inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
+proc; islossless; by rewrite dtext_ll.
 qed.
 
-local lemma EO_N_enc_post_ll :
-  phoare[EO_N.enc_post : true ==> true] = 1%r.
+local lemma EO_N_enc_post_ll : islossless EO_N.enc_post.
 proof.
-proc.
-if.
-seq 2 : true.
-auto.
-auto; progress; by rewrite dtext_ll.
-inline*; wp; sp.
-if; [auto; progress; by rewrite dtext_ll | auto].
-hoare; auto.
-trivial.
-auto.
+proc; islossless; by rewrite dtext_ll.
 qed.
 
-local lemma EO_N_genc_ll :
-  phoare[EO_N.genc : true ==> true] = 1%r.
+local lemma EO_N_genc_ll : islossless EO_N.genc.
 proof.
-proc; auto; progress; by rewrite dtext_ll.
+proc; islossless; by rewrite dtext_ll.
 qed.
 
 (* note no assumption about genc's argument, x *)
 
 local lemma EO_I_EO_N_genc :
-  equiv[EO_I.genc ~ EO_N.genc :
-        true ==> ={res}].
+  equiv[EO_I.genc ~ EO_N.genc : true ==> ={res}].
 proof.
 proc.
 wp.
@@ -1293,17 +1214,13 @@ local lemma G3_G4 &m :
 proof.
 byequiv => //.
 proc.
-seq 1 1 : (={TRF.mp} /\ ={ctr_pre, ctr_post}(EO_I, EO_N)).
-inline*; auto.
-seq 1 1 :
-  (={x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_N)); first sim.
-seq 1 1 :
-  (={b, x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_N)).
-auto.
-seq 1 1 :
-  (={c, b, x1, x2, TRF.mp, glob Adv} /\ ={ctr_post}(EO_I, EO_N)).
-call EO_I_EO_N_genc; first auto.
+call (_ : ={TRF.mp} /\ ={ctr_post}(EO_I, EO_N)).
 sim.
+call EO_I_EO_N_genc.
+rnd.
+call (_ : ={TRF.mp} /\ ={ctr_pre}(EO_I, EO_N)).
+sim.
+inline*; auto.
 qed.
 
 local lemma INDCPA_G4 &m :
@@ -1342,7 +1259,8 @@ end section.
 (* IND-CPA security theorem
 
    we need to assume Adv is lossless and that it doesn't interact with
-   EncO or PRF/TRF/Adv2RFA (which appear in the upper bound)
+   EncO (which INDCPA uses) or PRF/TRF/Adv2RFA (which appear in the
+   upper bound)
 
    because Enc is stateless, Adv may use it (and in any event could
    simulate it) *)
