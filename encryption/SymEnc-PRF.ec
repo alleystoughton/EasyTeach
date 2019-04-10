@@ -10,6 +10,7 @@ require export AllCore Distr DBool List SmtMap FSet Mu_mem.
 require import StdBigop. import Bigreal BRA.
 require import StdOrder. import RealOrder.
 require import StdRing. import RField.
+require import SmtMapAux.
 require BitWord FelTactic.
 
 (* require but don't import theories for symmetric encryption and
@@ -945,18 +946,14 @@ if{1}; auto.
 if{2}; auto.
 move => /> &1 &2 ? _ _ eq_exc _ _.
 split => [| _ x _ y _]; first rewrite dtext_ll.
-rewrite eq_exceptP /pred1 in eq_exc.
-rewrite eq_exceptP => z; rewrite /pred1 => ne_z_genc_inp.
-by rewrite get_set_neqE // get_set_neqE // eq_exc.
+by rewrite eq_except_pred_set.
 move => /> &1 &2 ? _ _ eq_exc _ _.
 split => [| _ x _]; first rewrite dtext_ll.
-rewrite eq_exceptP => y; rewrite /pred1 => ne_y_genc_inp.
-by rewrite get_set_neqE // eq_exc.
+by rewrite eq_except_pred_set_l.
 if{2}; auto.
 move => /> &1 &2 ? _ _ eq_exc _ _.
 split => [| _ x _]; first rewrite dtext_ll.
-rewrite eq_exceptP => y; rewrite /pred1 => ne_y_genc_inp.
-by rewrite get_set_neqE // eq_exc.
+by rewrite eq_except_pred_set_r.
 inline*; wp; sp.
 if => //.
 move => /> &1 &2 _ _ eq_exc ne_u_genc_inp.
@@ -969,8 +966,8 @@ split; first by rewrite eq_except_set_eq.
 congr; by rewrite 2!get_set_sameE.
 auto => /> &1 &2 _ _ eq_exc ne_u_genc_inp _.
 congr.
-rewrite eq_exceptP in eq_exc.
-by rewrite eq_exc.
+by rewrite (eq_except_not_pred_get (pred1 EO_I.genc_inp{2})
+            _ TRF.mp{1} TRF.mp{2}).
 auto.
 qed.
 
@@ -1062,7 +1059,7 @@ wp.
 rnd (pred1 EO_I.genc_inp).
 auto => /> &hr _.
 by rewrite mu1_dtext.
-inline*; wp; sp; if; auto.
+auto.
 hoare; inline*; wp; sp; if; auto.
 trivial.
 (* 4 *)
@@ -1073,7 +1070,7 @@ auto => /> &hr lt_lim le_lim x _.
 split => [| _].
 rewrite ltzS lezz.
 rewrite addzC lez_add1r lt_lim.
-if; [inline*; wp; sp; if; auto | inline*; wp; sp; if; auto].
+if; inline*; wp; sp; if; auto.
 (* 5 *)
 progress; proc.
 rcondf 1; first auto.
