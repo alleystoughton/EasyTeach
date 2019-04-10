@@ -28,10 +28,8 @@ lemma eq_except_pred_set_r
       (X : 'a -> bool) (x : 'a) (y : 'b) (m1 m2 : ('a, 'b) fmap) :
   eq_except X m1 m2 => X x => eq_except X m1 m2.[x <- y].
 proof.
-move => /eq_exceptP eq_exc X_x.
-rewrite eq_exceptP => z not_X_z.
-case (z = x) => [->> // |] ne_z_x.
-by rewrite get_set_neqE // eq_exc.
+move => eq_exc X_x.
+by rewrite eq_except_sym eq_except_pred_set_l 1:eq_except_sym.
 qed.
 
 lemma eq_except_not_pred_get
