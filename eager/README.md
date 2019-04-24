@@ -8,7 +8,7 @@ handling redundant hashing.
 The abstract theory [`RedundantHashing.eca`](RedundantHashing.ec) is
 proved using EasyCrypt's eager tactics, as well as its transitivity
 tactic. (It uses the auxiliary theories [`FSetAux.ec`](FSetAux.ec) and
-[`ListAux.ec`](ListAux.ec).
+[`ListAux.ec`](ListAux.ec)).
 
 And [`EagerEx.ec`](EagerEx.ec) is proved using 
 [`RedundantHashing.eca`](RedundantHashing.ec).
