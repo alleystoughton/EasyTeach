@@ -368,14 +368,9 @@ local lemma GNonOptHashing_GNOH'_main :
    ={glob HashAdv} ==> ={res}].
 proof.
 proc; inline NonOptHashing.init NOH'.init.
-seq 1 2 :
-  (={glob HashAdv} /\ ={mp}(NonOptHashing, NOH') /\
-   NOH'.red_inps{2} \subset fdom NOH'.mp{2}).   
-auto; smt(fdom0).
-call
-  (_ :
-   ={mp}(NonOptHashing, NOH') (*/\
-   NOH'.red_inps{2} \subset fdom NOH'.mp{2}*)).
+seq 1 2 : (={glob HashAdv} /\ ={mp}(NonOptHashing, NOH')).   
+auto.
+call (_ : ={mp}(NonOptHashing, NOH')).
 apply NonOptHashing_NOH'_hash.
 apply NonOptHashing_NOH'_rhash.
 auto.
