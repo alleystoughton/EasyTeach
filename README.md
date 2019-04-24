@@ -52,3 +52,12 @@ The subdirectory [`encryption`](../master/encryption) contains the proof
 of IND-CPA (indistinguishability under chosen plaintext attack)
 security for symmetric encryption built out of a pseudorandom
 function.
+
+Fifth Example: Eager/Lazy Random Sampling
+--------------------------------------------------------------------
+
+The subdirectory [`eager`](../master/eager) shows how to switch
+back and forth between eager and lazy random sampling. This is
+done using an abstract theory for handling redundant hashing, which
+is proved using EasyCrypt's eager tactics, as well as its transitivity
+tactic.
