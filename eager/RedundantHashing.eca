@@ -252,7 +252,10 @@ local module OH' : HASHING, HASHING' = {
 
   proc hash(inp : input) : output = {
     (* the second disjunct is needed for the proof of
-       lemma eager_hash *)
+       lemma eager_hash, because there we can't use
+       the invariant:
+
+       forall inp', mem red_inps inp' => ! dom mp inp' *)
     if (! dom mp inp \/ mem red_inps inp) {
       mp.[inp] <$ doutput;
       red_inps <- red_inps `\` fset1 inp;
