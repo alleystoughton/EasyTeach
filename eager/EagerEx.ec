@@ -128,15 +128,12 @@ call
    RH.OptHashing.mp{2}.[TheBool] = Some (oget Or.b_opt{1})).
 proc; inline*; sp.
 if.
-move => &1 &2 [#] -> _ [].
-progress; by rewrite mem_empty.
-move => [#] -> //=.
-rewrite domE => -> //.
-auto; progress.
+move => &1 &2 [#] -> _ [[#] -> -> | [#] -> /=].
+by rewrite mem_empty.
+by rewrite domE => ->.
+auto => /> &2 -> bL _.
 by rewrite oget_some get_set_sameE oget_some.
-by rewrite oget_some get_set_sameE.
-auto => /> &1 &2 [] //.
-progress; by rewrite H0 oget_some.
+auto => /> &1 &2 [] // [#] -> -> //.
 auto.
 qed.
 
