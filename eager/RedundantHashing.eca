@@ -768,7 +768,6 @@ transitivity{1}
   NOH'.red_inps{1} = fset0 ==>
   ={b})
  (={glob HashAdv} /\ ={mp, red_inps}(NOH', OH') ==> ={b}) => //.
-progress.
 progress; by exists (glob HashAdv){2} OH'.mp{2} fset0.
 seq 0 1 : (={glob HashAdv} /\ ={NOH'.mp, NOH'.red_inps}).
 exists* NOH'.mp{2}; elim* => mp'.
