@@ -177,7 +177,7 @@ by rewrite -xorA xor_double_same_left.
 call (_ : true).
 wp.
 call (_ : true).
-auto => /> &1 &2.
+auto => />.
 by rewrite xor_double_same_right.
 qed.
 
