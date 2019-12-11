@@ -944,15 +944,13 @@ wp; sp.
 inline*; wp; sp.
 if{1}; auto.
 if{2}; auto.
-move => /> &1 &2 ? _ _ eq_exc _ _.
-split => [| _ x _ y _]; first rewrite dtext_ll.
+move => /> &1 &2 ? _ _ eq_exc _ _ mp _ mp0 _.
 by rewrite eq_except_pred_set.
-move => /> &1 &2 ? _ _ eq_exc _ _.
-split => [| _ x _]; first rewrite dtext_ll.
+move => /> &1 &2 ? _ _ eq_exc _ _ mp _.
 by rewrite eq_except_pred_set_l.
 if{2}; auto.
 move => /> &1 &2 ? _ _ eq_exc _ _.
-split => [| _ x _]; first rewrite dtext_ll.
+move => mp _.
 by rewrite eq_except_pred_set_r.
 inline*; wp; sp.
 if => //.
@@ -1200,9 +1198,6 @@ proc.
 wp.
 rnd (fun z => x{1} +^ z).
 auto; progress.
-by rewrite text_xorA text_xorK text_xor_lid.
-by rewrite 2!mu1_dtext.
-rewrite dtext_fu.
 by rewrite text_xorA text_xorK text_xor_lid.
 qed.
 

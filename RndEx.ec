@@ -26,12 +26,10 @@ lemma M_N_equiv :
 proof.
 proc.
 seq 0 1 : (true).
-rnd{2}; skip; apply dbool_ll.
+rnd{2}; auto.
 rnd (fun x => x ^^ b1{2}).
 skip; progress.
 by rewrite xorA xorK xor_false.
-by rewrite !dbool1E.
-rewrite dbool_fu.
 by rewrite xorA xorK xor_false.
 by rewrite xorC xorA xorK xor_false. 
 qed.
