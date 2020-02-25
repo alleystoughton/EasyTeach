@@ -164,7 +164,7 @@ module INDCPA (Enc : ENC, Adv : ADV) = {
   module A = Adv(EO)           (* connect Adv to EO *)
 
   proc main() : bool = {
-    var b, b' : bool; var x1, x2 : text; var c : cipher; var k : key;
+    var b, b' : bool; var x1, x2 : text; var c : cipher;
     EO.init();                 (* initialize EO *)
     (x1, x2) <@ A.choose();    (* let A choose plaintexts x1/x2 *)
     b <$ {0,1};                (* choose boolean b *)
