@@ -98,7 +98,7 @@ seq 3 4 :
    RH.NonOptHashing.mp{2}.[TheBool] = Some (oget Or.b_opt{1})).
 wp; sp.
 rcondt{2} 1; first auto; progress; by rewrite mem_empty.
-rnd; auto; progress; by rewrite get_set_sameE.
+wp; rnd; auto; progress; by rewrite get_set_sameE.
 call
   (_ : 
    Or.b_opt{1} <> None /\
