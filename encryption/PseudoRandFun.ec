@@ -70,8 +70,10 @@ module TRF : RF = {
   }
 
   proc f(x : text) : text = {
+    var y : text;
     if (! x \in mp) {   (* give x a random value in *)
-      mp.[x] <$ dtext;  (* mp if not already in mp's domain *)
+      y <$ dtext;  (* mp if not already in mp's domain *)
+      mp.[x] <- y;
     }
     return oget mp.[x];
   }

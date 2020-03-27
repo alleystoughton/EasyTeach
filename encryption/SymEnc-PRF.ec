@@ -660,7 +660,7 @@ rnd; auto; progress;
   [by rewrite ltzS |
    by rewrite addzC lez_add1r |
    apply dtext_ll].
-inline*; wp; sp; if.
+inline*; wp; sp; if; wp.
 rnd predT. (* rnd without an argument doesn't work! *)
 auto => /> &hr lt_card_dom_mp_ctr _ not_mem_u_dom_mp.
 split => [| _ y _ _]; first apply dtext_ll.

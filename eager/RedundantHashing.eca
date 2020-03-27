@@ -70,8 +70,10 @@ module NonOptHashing : HASHING = {
   }
 
   proc hash(inp : input) : output = {
+    var out : output;
     if (! dom mp inp) {
-      mp.[inp] <$ doutput;
+      out <$ doutput;      
+      mp.[inp] <- out;
     }
     return oget mp.[inp];
   }
@@ -91,8 +93,10 @@ module OptHashing : HASHING = {
   }
 
   proc hash(inp : input) : output = {
+    var out : output;
     if (! dom mp inp) {
-      mp.[inp] <$ doutput;
+      out <$ doutput;
+      mp.[inp] <- out;
     }
     return oget mp.[inp];
   }
@@ -196,8 +200,10 @@ local module NOH' : HASHING, HASHING' = {
   }
 
   proc hash(inp : input) : output = {
+    var out : output;
     if (! dom mp inp) {
-      mp.[inp] <$ doutput;
+      out <$ doutput;
+      mp.[inp] <- out;
     }
     else {
       (* if inp was redundant it's no longer so *)
@@ -207,8 +213,10 @@ local module NOH' : HASHING, HASHING' = {
   }
 
   proc rhash(inp : input) : unit = {
+    var out : output;
     if (! dom mp inp) {
-      mp.[inp] <$ doutput;
+      out <$ doutput;
+      mp.[inp] <- out;
       (* inp is redundant *)
       red_inps <- red_inps `|` fset1 inp;
     }
@@ -216,7 +224,9 @@ local module NOH' : HASHING, HASHING' = {
 
   module I = {
     proc f (inp : input) = {
-      mp.[inp] <$ doutput;
+      var out : output;
+      out <$ doutput;
+      mp.[inp] <- out;
     }
   }
 
@@ -234,8 +244,8 @@ local module NOH' : HASHING, HASHING' = {
   proc rehash_red_inps_addl(inp : input) : output = {
     var out : output;
     rehash_red_inps();
-    mp.[inp] <$ doutput;  (* after *)
-    out <- oget mp.[inp];
+    out <$ doutput;  (* after *)
+    mp.[inp] <- out;
     return out;
   }
 }.
@@ -251,13 +261,15 @@ local module OH' : HASHING, HASHING' = {
   }
 
   proc hash(inp : input) : output = {
+    var out : output;
     (* the second disjunct is needed for the proof of
        lemma eager_hash, because there we can't use
        the invariant:
 
        forall inp', mem red_inps inp' => ! dom mp inp' *)
     if (! dom mp inp \/ mem red_inps inp) {
-      mp.[inp] <$ doutput;
+      out <$ doutput;
+      mp.[inp] <- out;
       red_inps <- red_inps `\` fset1 inp;
     }
     return oget mp.[inp];
@@ -271,7 +283,9 @@ local module OH' : HASHING, HASHING' = {
 
   module I = {
     proc f (inp : input) = {
-      mp.[inp] <$ doutput;
+      var out : output;
+      out <$ doutput;
+      mp.[inp] <- out;
     }
   }
 
@@ -288,7 +302,8 @@ local module OH' : HASHING, HASHING' = {
 
   proc rehash_red_inps_addl(inp : input) : output = {
     var out : output;
-    mp.[inp] <$ doutput;  (* before *)
+    out <$ doutput;  (* before *)
+    mp.[inp] <- out;
     out <- oget mp.[inp];
     rehash_red_inps();
     return out;
@@ -507,24 +522,24 @@ local lemma NOH'_OH'_rehash_red_inps_addl_not_red :
   ={res} /\ NOH'.mp{1} = OH'.mp{2}].
 proof.
 proc.
-alias{1} 2 with resu; swap{1} 2 -1.
-alias{2} 1 with resu.
+swap{1} 2 -1.
 seq 1 1 : 
-  (={inp, resu} /\ ={mp, red_inps}(NOH', OH') /\
+  (={inp, out} /\ ={mp, red_inps}(NOH', OH') /\
    ! mem NOH'.red_inps{1} inp{1}); first auto.
 inline*; swap{2} 3 -2.
 seq 1 1 : 
-  (={inp, resu, l} /\ ={mp, red_inps}(NOH', OH') /\
+  (={inp, out, l} /\ ={mp, red_inps}(NOH', OH') /\
    ! mem l{1} inp{1}); first auto; smt(memE).
-wp; sp => /=; elim* => mp_R.
+wp; sp => /=.
+elim* => out_R mp_R.
 while
-  (={inp, resu, l} /\ ! mem l{1} inp{1} /\
+  (={inp, out, l} /\ ! mem l{1} inp{1} /\
    NOH'.red_inps{1} = OH'.red_inps{2} /\
-   NOH'.mp{1}.[inp{1} <- resu{1}] = OH'.mp{2}).
+   NOH'.mp{1}.[inp{1} <- out{1}] = OH'.mp{2}).
 auto; progress;
   [smt(mem_drop) |
    rewrite 2!set_setE; smt(mem_ne_list_drop1)].
-auto; progress; by rewrite 2!get_set_sameE.
+auto; progress; by rewrite get_set_sameE oget_some.
 qed.
 
 (* lemma for using iters_perm *)
@@ -536,12 +551,10 @@ local lemma iter_perm2 :
 proof.
 proc => /=; inline*; sp.
 case (t1{1} = t2{1}); first auto.
-alias{1} 1 with x1; alias{1} 4 with x2; swap{1} 4 -3.
-alias{2} 1 with y1; alias{2} 4 with y2; swap{2} 4 -2.
-seq 2 2 :
-  (={t1, t2, glob NOH'.I} /\ inp{1} = t1{1} /\ inp{2} = t2{2} /\
-   t1{1} <> t2{2} /\ x1{1} = y2{2} /\ x2{1} = y1{2}); first auto.
-auto; progress; rewrite 2!set_setE /#.
+swap 3 -2.
+swap{1} 4 -1.
+swap{2} 4 -2.
+auto; progress; rewrite set_setE /#.
 qed.
 
 local lemma NOH'_rehash_red_inps_rslt_rehash_red_inps_addl :
