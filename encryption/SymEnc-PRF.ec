@@ -6,7 +6,7 @@
 
 prover [""].  (* no SMT solvers *)
 
-require export AllCore Distr DBool List SmtMap FSet Mu_mem.
+require import AllCore Distr DBool List SmtMap FSet Mu_mem.
 require import StdBigop. import Bigreal BRA.
 require import StdOrder. import RealOrder.
 require import StdRing. import RField.
