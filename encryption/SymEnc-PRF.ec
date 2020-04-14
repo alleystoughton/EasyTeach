@@ -183,10 +183,6 @@ apply dtext_ll.
 by rewrite -text_xorA text_xorK text_xor_rid.
 qed.
 
-(* standard encryption oracle *)
-
-module EO : EO = EncO(Enc).
-
 (* module turning an encryption adversary Adv into a random function
    adversary
 
@@ -368,7 +364,7 @@ local module G1 (RF : RF) = {
 }.    
 
 local lemma EO_EO_RF_PRF_enc_pre :
-  equiv[EO.enc_pre ~ EO_RF(PRF).enc_pre :
+  equiv[EncO(Enc).enc_pre ~ EO_RF(PRF).enc_pre :
         ={x} /\ ={key}(EncO, PRF) /\ ={ctr_pre}(EncO, EO_RF) ==>
         ={res} /\ ={ctr_pre}(EncO, EO_RF)].
 proof.
@@ -376,14 +372,14 @@ proc; inline*; if => //; [wp; rnd; auto | auto].
 qed.
 
 local lemma EO_EO_RF_PRF_genc :
-  equiv[EO.genc ~ EO_RF(PRF).genc :
+  equiv[EncO(Enc).genc ~ EO_RF(PRF).genc :
         ={x} /\ ={key}(EncO, PRF) ==> ={res}].
 proof.
 proc; inline*; wp; rnd; auto.
 qed.
 
 local lemma EO_EO_RF_PRF_enc_post :
-  equiv[EO.enc_post ~ EO_RF(PRF).enc_post :
+  equiv[EncO(Enc).enc_post ~ EO_RF(PRF).enc_post :
         ={x} /\ ={key}(EncO, PRF) /\ ={ctr_post}(EncO, EO_RF) ==>
         ={res} /\ ={ctr_post}(EncO, EO_RF)].
 proof.
@@ -394,11 +390,11 @@ local lemma INDCPA_G1_PRF &m :
   Pr[INDCPA(Enc, Adv).main() @ &m : res] = Pr[G1(PRF).main() @ &m : res].
 proof.
 byequiv => //; proc.
-call (_ : ={key}(EO, PRF) /\ ={ctr_post}(EO, EO_RF)).
+call (_ : ={key}(EncO(Enc), PRF) /\ ={ctr_post}(EncO(Enc), EO_RF)).
 by conseq EO_EO_RF_PRF_enc_post.
 call EO_EO_RF_PRF_genc.
 rnd.
-call (_ : ={key}(EO, PRF) /\ ={ctr_pre}(EO, EO_RF)).
+call (_ : ={key}(EncO(Enc), PRF) /\ ={ctr_pre}(EncO(Enc), EO_RF)).
 by conseq EO_EO_RF_PRF_enc_pre.
 inline*; auto.
 qed.
