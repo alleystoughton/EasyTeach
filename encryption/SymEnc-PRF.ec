@@ -787,7 +787,7 @@ rewrite
 qed.
 
 (* version of encryption oracle in which genc doesn't update TRF.mp at
-   all (I for Independent of map) *)
+   all (I for Independent of map); we no longer need clash_pre *)
 
 local module EO_I : EO = {
   var ctr_pre : int
