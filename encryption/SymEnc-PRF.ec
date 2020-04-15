@@ -792,13 +792,12 @@ qed.
 local module EO_I : EO = {
   var ctr_pre : int
   var ctr_post : int
-  var clash_pre : bool
   var clash_post : bool
   var genc_inp : text
 
   proc init() = {
     TRF.init();
-    ctr_pre <- 0; ctr_post <- 0; clash_pre <- false;
+    ctr_pre <- 0; ctr_post <- 0;
     clash_post <- false; genc_inp <- text0;
   }
 
@@ -819,9 +818,6 @@ local module EO_I : EO = {
   proc genc(x : text) : cipher = {
     var u, v : text; var c : cipher;
     u <$ dtext;
-    if (u \in TRF.mp) {
-      clash_pre <- true;
-    }
     genc_inp <- u;
     v <$ dtext;
     (* note: map no longer updated *)
@@ -913,8 +909,8 @@ local lemma EO_O_EO_I_genc :
         eq_except (pred1 EO_I.genc_inp{2}) TRF.mp{1} TRF.mp{2}].
 proof.        
 proc.
-seq 1 1 : (={u, x, TRF.mp}); first auto.
-if => //; auto; progress; rewrite eq_except_setl.
+seq 2 1 : (={u, x, TRF.mp}); first auto.
+auto; progress; rewrite eq_except_setl.
 qed.
 
 local lemma EO_O_EO_I_enc_post :
