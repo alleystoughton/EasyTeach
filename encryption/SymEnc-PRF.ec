@@ -271,7 +271,9 @@ declare module Adv : ADV{EncO, PRF, TRF, Adv2RFA}.
    procedures, for all encryption oracles whose accessible procedures
    are themselves lossless
 
-   this is required for us to use upto bad reasoning *)
+   this is required for us to use up to bad reasoning, as well
+   as for the proof that the probability of the final game, G4,
+   returning true is 1%r / 2%r *)
 
 axiom Adv_choose_ll :
   forall (EO <: EO{Adv}),
@@ -496,7 +498,7 @@ local module G2 = {
   }
 }.    
 
-(* we use upto bad reasoning to connect G1(TRF) and G2 *)
+(* we use up to bad reasoning to connect G1(TRF) and G2 *)
 
 local lemma EO_O_enc_pre_ll : islossless EO_O.enc_pre.
 proof.
@@ -859,7 +861,7 @@ local module G3 = {
   }
 }.    
 
-(* we use upto bad reasoning to connect G2 and G3 *)
+(* we use up to bad reasoning to connect G2 and G3 *)
 
 local lemma EO_O_enc_post_pres_clash_post :
   phoare[EO_O.enc_post :
