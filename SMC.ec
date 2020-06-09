@@ -58,8 +58,8 @@ lemma dbits_fu : is_full dbits.
 proof.
 move => x.
 rewrite /support dbits1E.
-by rewrite StdRing.RField.div1r StdOrder.RealOrder.invr_gt0
-           lt_fromint powPos.
+by rewrite RField.div1r StdOrder.RealOrder.invr_gt0
+           lt_fromint StdOrder.IntOrder.expr_gt0.
 qed.
 
 (* module type of Adversaries *)

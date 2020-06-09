@@ -699,8 +699,8 @@ conseq (_ : _ ==> u \in fdom TRF.mp).
 move => /> &hr le_card_dom_mp_limit _ u0.
 by rewrite mem_fdom.
 rnd; simplify; skip; progress.
-by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0
-           1:le_fromint 1:ltzW 1:powPos // le_fromint.
+by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0 1:le_fromint
+         1:StdOrder.IntOrder.expr_ge0 1:ltzW // le_fromint.
 auto; progress; by rewrite dtext_ll.
 hoare; inline*; auto; progress.
 trivial.
@@ -1033,8 +1033,8 @@ fel
   (* invariant *)
   (EO_I.ctr_post <= limit_post) => //.
 (* 1 *)
-by rewrite sumr_const intmulr /= count_predT size_range
-           max_ler /= 1:ge0_limit_post.
+by rewrite sumr_const intmulr /= count_predT size_range /=
+           IntOrder.ler_maxr /= 1:ge0_limit_post.
 (* 2 *)
 inline*; auto; progress; rewrite ge0_limit_post.
 (* 3 *)
