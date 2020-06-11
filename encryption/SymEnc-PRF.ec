@@ -72,7 +72,7 @@ lemma text_xor_rid (x : text) : x +^ text0 = x.
 proof. apply Text.xorw0. qed.
 
 lemma text_xor_lid (x : text) : text0 +^ x = x.
-proof. by rewrite Text.xorwC text_xor_rid. qed.
+proof. by rewrite text_xorC text_xor_rid. qed.
 
 (* full/uniform/lossless distribution *)
 
