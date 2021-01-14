@@ -666,7 +666,7 @@ by rewrite fdom_set fcardUI_indep 1:fsetI1 1:mem_fdom
            1:not_mem_u_dom_mp // fcard1 addzC lez_add1r.
 auto; progress; by rewrite ltzW.
 hoare; simplify.
-rnd; auto => /> &hr le_card_dom_mp_ctr _ _ _ _.
+rnd; auto => /> &hr le_card_dom_mp_ctr _ lt_ctr_limit _ _.
 split => [| _]; [by rewrite ltzS | by rewrite addzC lez_add1r].
 trivial.
 auto.
@@ -1049,7 +1049,7 @@ seq 2 :
 auto.
 wp.
 rnd (pred1 EO_I.genc_inp).
-auto => /> &hr _.
+auto => /> &hr ctr_post.
 by rewrite mu1_dtext.
 auto.
 hoare; inline*; wp; sp; if; auto.
@@ -1058,7 +1058,7 @@ trivial.
 progress; proc.
 rcondt 1; first auto.
 seq 2 : (c < EO_I.ctr_post <= limit_post).
-auto => /> &hr lt_lim le_lim x _.
+auto => /> lt_lim _ x _.
 split => [| _].
 rewrite ltzS lezz.
 rewrite addzC lez_add1r lt_lim.
