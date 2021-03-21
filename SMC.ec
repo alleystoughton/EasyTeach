@@ -1,6 +1,8 @@
 (* Secure Message Communication via a One-time Pad, Formalized
    in Ordinary (Non-UC) Real/Ideal Paradigm Style *)
 
+prover [""].  (* no use of smt *)
+
 require import AllCore Distr.
 
 (* minimal axiomatization of bitstrings *)
@@ -9,7 +11,7 @@ op n : int.  (* length of bitstrings *)
 
 axiom ge0_n : 0 <= n.
 
-type bits.  (* type of bitstrings *)
+type bits.
 
 op zero : bits.  (* the all zero bitstring *)
 
@@ -74,7 +76,9 @@ module type ADV = {
 
   proc obs(x : bits) : unit
 
-  (* give Adversary decryption of received message *)
+  (* give Adversary decryption of received message, and ask it for its
+     boolean judgment (the adversary is trying to differentiate the
+     real and ideal games) *)
 
   proc put(x : bits) : bool
 }.
@@ -85,7 +89,11 @@ module GReal (Adv : ADV) = {
   var pad : bits  (* one-time pad *)
 
   (* generate the one-time pad, sharing with both parties; we're
-     assuming Adversary observes nothing when this happens *)
+     assuming Adversary observes nothing when this happens
+
+     of course, it's not realistic that a one-time pad can be
+     generated and secretly shared, but the parties still need to use
+     a one-time pad for secure communication *)
 
   proc gen() : unit = {
     pad <$ dbits;
@@ -117,7 +125,8 @@ module GReal (Adv : ADV) = {
 (* module type of Simulators *)
 
 module type SIM = {
-  (* choose gets no help to simulate encrypted message *)
+  (* choose gets no help to simulate encrypted message; we specify
+     below that choose can't read/write GReal.pad *)
 
   proc choose() : bits
 }.
@@ -137,23 +146,36 @@ module GIdeal(Sim : SIM, Adv : ADV) = {
   }    
 }.
 
-(* Simulator - part of proof, not security specification *)
+(* our goal is to prove the following security theorem, saying the
+   Adversary is completely unable to distinguish the real and ideal
+   games:
 
-module Sim : SIM = {
+lemma Security (Adv <: ADV{GReal}) &m :
+  exists (Sim <: SIM{GReal}),  (* there is a simulator that can't read/write
+                                  GReal.pad *)
+  Pr[GReal(Adv).main() @ &m : res] =
+  Pr[GIdeal(Sim, Adv).main() @ &m : res].
+*)
+
+(* enter section, so Adversary is in scope *)
+
+section.
+
+(* say Adv and GReal don't read/write each other's globals (GIdeal
+   has no globals) *)
+
+declare module Adv : ADV{GReal}.
+
+(* define simulator as a local module, as security theorem won't
+   depend upon it *)
+
+local module Sim : SIM = {
   proc choose() : bits = {
     var x : bits;
     x <$ dbits;
     return x;
   }
 }.
-
-(* enter section, so Adversary is in scope *)
-
-section.
-
-(* say Adv and GReal don't read/write each other's globals *)
-
-declare module Adv : ADV{GReal}.
 
 local lemma GReal_GIdeal :
   equiv[GReal(Adv).main ~ GIdeal(Sim, Adv).main :
@@ -162,7 +184,7 @@ proof.
 proc.
 inline*.
 seq 1 1 : (={x, glob Adv}).
-call (_ : true).
+call (_ : true).  (* because Adv doesn't use oracle, invariant is "true" *)
 auto.
 seq 1 1 : (={x, glob Adv} /\ x{1} ^^ GReal.pad{1} = x0{2}).
 rnd (fun z => x{1} ^^ z).
@@ -174,7 +196,7 @@ by rewrite 2!dbits1E.
 split => [| _].
 apply dbits_fu.
 by rewrite -xorA xor_double_same_left.
-call (_ : true).
+call (_ : true).  (* last statement of each program must be call *)
 wp.
 call (_ : true).
 auto => />.
@@ -182,9 +204,11 @@ by rewrite xor_double_same_right.
 qed.
 
 lemma Sec &m :
+  exists (Sim <: SIM{GReal}),
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 proof.
+exists Sim.
 by byequiv GReal_GIdeal.
 qed.
 
@@ -193,6 +217,8 @@ end section.
 (* security theorem *)
 
 lemma Security (Adv <: ADV{GReal}) &m :
+  exists (Sim <: SIM{GReal}),  (* there is a simulator that can't read/write
+                                  GReal.pad *)
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 proof.
