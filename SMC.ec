@@ -11,7 +11,7 @@ op n : int.  (* length of bitstrings *)
 
 axiom ge0_n : 0 <= n.
 
-type bits.
+type bits.  (* type of bit strings of length n *)
 
 op zero : bits.  (* the all zero bitstring *)
 
