@@ -265,7 +265,7 @@ section.
 
    the scope of Adv is the rest of the section *)
 
-declare module Adv : ADV{EncO, PRF, TRF, Adv2RFA}.
+declare module Adv <: ADV{EncO, PRF, TRF, Adv2RFA}.
 
 (* axiomatize losslessness (termination for all arguments) of Adv's
    procedures, for all encryption oracles whose accessible procedures
@@ -275,11 +275,11 @@ declare module Adv : ADV{EncO, PRF, TRF, Adv2RFA}.
    as for the proof that the probability of the final game, G4,
    returning true is 1%r / 2%r *)
 
-axiom Adv_choose_ll :
+declare axiom Adv_choose_ll :
   forall (EO <: EO{Adv}),
   islossless EO.enc_pre => islossless Adv(EO).choose.
 
-axiom Adv_guess_ll :
+declare axiom Adv_guess_ll :
   forall (EO <: EO{Adv}),
   islossless EO.enc_post => islossless Adv(EO).guess.
 

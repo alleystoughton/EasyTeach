@@ -164,7 +164,7 @@ section.
 (* say Adv and GReal don't read/write each other's globals (GIdeal
    has no globals) *)
 
-declare module Adv : ADV{GReal}.
+declare module Adv <: ADV{GReal}.
 
 (* define simulator as a local module, as security theorem won't
    depend upon it *)

@@ -55,7 +55,7 @@ module GLazy (Adv : ADV) = {
 
 section.
 
-declare module Adv : ADV{Or}.
+declare module Adv <: ADV{Or}.
 
 type input = [TheBool].  (* TheBool is only element of input *)
 
