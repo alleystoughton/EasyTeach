@@ -23,6 +23,24 @@ check SimpLogic.ec
 check RndEx.ec
 check SMC.ec
 
+cd encryption
+echo cd to encryption
+echo ""
+
+check-all-scripts
+
+echo cd to ..
+cd ..
+
+cd eager
+echo cd to eager
+echo ""
+
+check-all-scripts
+
+echo cd to ..
+cd ..
+
 # success!
 
 exit 0
