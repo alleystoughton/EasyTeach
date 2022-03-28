@@ -55,7 +55,7 @@ module GLazy (Adv : ADV) = {
 
 section.
 
-declare module Adv <: ADV{Or}.
+declare module Adv <: ADV{-Or}.
 
 type input = [TheBool].  (* TheBool is only element of input *)
 
@@ -147,7 +147,7 @@ qed.
 
 end section.
 
-lemma eager_lazy (Adv <: ADV{Or}) &m :
+lemma eager_lazy (Adv <: ADV{-Or}) &m :
   Pr[GEager(Adv).main() @ &m : res] = Pr[GLazy(Adv).main() @ &m : res].
 proof.
 apply (eag_laz Adv &m).

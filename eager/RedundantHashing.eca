@@ -107,7 +107,7 @@ module OptHashing : HASHING = {
 (* Hashing Adversary *)
 
 module type HASHING_ADV (H : HASHING) = {
-  proc main() : bool {H.hash H.rhash}
+  proc main() : bool {H.hash, H.rhash}
 }.
 
 (* games based on the two implementations of hashing *)
@@ -144,7 +144,7 @@ section.
    adversary has already returned its boolean result (and so oracle
    map equality is no longer of interest) *)
 
-declare module HashAdv <: HASHING_ADV{NonOptHashing, OptHashing}.
+declare module HashAdv <: HASHING_ADV{-NonOptHashing, -OptHashing}.
 
 (* extended hashing module interface
 
@@ -804,7 +804,7 @@ qed.
 end section.
 
 lemma GNonOptHashing_GOptHashing
-      (HashAdv <: HASHING_ADV{NonOptHashing, OptHashing}) &m :
+      (HashAdv <: HASHING_ADV{-NonOptHashing, -OptHashing}) &m :
     Pr[GNonOptHashing(HashAdv).main() @ &m : res] =
     Pr[GOptHashing(HashAdv).main() @ &m : res].
 proof. apply (GNonOptHashing_GOH' HashAdv &m). qed.

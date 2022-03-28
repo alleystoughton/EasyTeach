@@ -150,9 +150,9 @@ module GIdeal(Sim : SIM, Adv : ADV) = {
    Adversary is completely unable to distinguish the real and ideal
    games:
 
-lemma Security (Adv <: ADV{GReal}) &m :
-  exists (Sim <: SIM{GReal}),  (* there is a simulator that can't read/write
-                                  GReal.pad *)
+lemma Security (Adv <: ADV{-GReal}) &m :
+  exists (Sim <: SIM{-GReal}),  (* there is a simulator that can't read/write
+                                   GReal.pad *)
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 *)
@@ -164,7 +164,7 @@ section.
 (* say Adv and GReal don't read/write each other's globals (GIdeal
    has no globals) *)
 
-declare module Adv <: ADV{GReal}.
+declare module Adv <: ADV{-GReal}.
 
 (* define simulator as a local module, as security theorem won't
    depend upon it *)
@@ -204,7 +204,7 @@ by rewrite xor_double_same_right.
 qed.
 
 lemma Sec &m :
-  exists (Sim <: SIM{GReal}),
+  exists (Sim <: SIM{-GReal}),
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 proof.
@@ -216,9 +216,9 @@ end section.
 
 (* security theorem *)
 
-lemma Security (Adv <: ADV{GReal}) &m :
-  exists (Sim <: SIM{GReal}),  (* there is a simulator that can't read/write
-                                  GReal.pad *)
+lemma Security (Adv <: ADV{-GReal}) &m :
+  exists (Sim <: SIM{-GReal}),  (* there is a simulator that can't read/write
+                                   GReal.pad *)
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 proof.

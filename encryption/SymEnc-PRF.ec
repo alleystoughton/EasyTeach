@@ -265,7 +265,7 @@ section.
 
    the scope of Adv is the rest of the section *)
 
-declare module Adv <: ADV{EncO, PRF, TRF, Adv2RFA}.
+declare module Adv <: ADV{-EncO, -PRF, -TRF, -Adv2RFA}.
 
 (* axiomatize losslessness (termination for all arguments) of Adv's
    procedures, for all encryption oracles whose accessible procedures
@@ -276,11 +276,11 @@ declare module Adv <: ADV{EncO, PRF, TRF, Adv2RFA}.
    returning true is 1%r / 2%r *)
 
 declare axiom Adv_choose_ll :
-  forall (EO <: EO{Adv}),
+  forall (EO <: EO{-Adv}),
   islossless EO.enc_pre => islossless Adv(EO).choose.
 
 declare axiom Adv_guess_ll :
-  forall (EO <: EO{Adv}),
+  forall (EO <: EO{-Adv}),
   islossless EO.enc_post => islossless Adv(EO).guess.
 
 (* version of encryption oracle that takes implementation of
@@ -401,7 +401,7 @@ by conseq EO_EO_RF_PRF_enc_pre.
 inline*; auto.
 qed.
 
-local lemma G1_GRF (RF <: RF{EO_RF, Adv, Adv2RFA}) &m :
+local lemma G1_GRF (RF <: RF{-EO_RF, -Adv, -Adv2RFA}) &m :
   Pr[G1(RF).main() @ &m : res] =
   Pr[GRF(RF, Adv2RFA(Adv)).main() @ &m : res].
 proof.
@@ -1251,10 +1251,10 @@ end section.
    because Enc is stateless, Adv may use it (and in any event could
    simulate it) *)
 
-lemma INDCPA (Adv <: ADV{EncO, PRF, TRF, Adv2RFA}) &m :
-  (forall (EO <: EO{Adv}),
+lemma INDCPA (Adv <: ADV{-EncO, -PRF, -TRF, -Adv2RFA}) &m :
+  (forall (EO <: EO{-Adv}),
    islossless EO.enc_pre => islossless Adv(EO).choose) =>
-  (forall (EO <: EO{Adv}),
+  (forall (EO <: EO{-Adv}),
    islossless EO.enc_post => islossless Adv(EO).guess) =>
   `|Pr[INDCPA(Enc, Adv).main() @ &m : res] - 1%r / 2%r| <=
   `|Pr[GRF(PRF, Adv2RFA(Adv)).main() @ &m : res] -
