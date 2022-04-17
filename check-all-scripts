@@ -27,7 +27,7 @@ cd encryption
 echo cd to encryption
 echo ""
 
-check-all-scripts
+./check-all-scripts
 
 echo cd to ..
 cd ..
@@ -36,7 +36,7 @@ cd eager
 echo cd to eager
 echo ""
 
-check-all-scripts
+./check-all-scripts
 
 echo cd to ..
 cd ..
