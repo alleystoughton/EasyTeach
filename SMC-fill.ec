@@ -67,10 +67,9 @@ qed.
 (* module type of Adversaries *)
 
 module type ADV = {
-  (* ask Adversary for message to securely communicate; the
-     asterisk means get initializes Adversary's state *)
+  (* ask Adversary for message to securely communicate *)
 
-  proc * get() : bits
+  proc get() : bits
 
   (* let Adversary observe encrypted message being communicated *)
 

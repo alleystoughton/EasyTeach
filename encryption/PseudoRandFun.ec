@@ -37,7 +37,7 @@ op F : key -> text -> text.  (* PRF *)
 
 module type RF = {
   (* initialization *)
-  proc * init() : unit
+  proc init() : unit
 
   (* application to a text *)
   proc f(x : text) : text
@@ -86,7 +86,7 @@ module TRF : RF = {
    function) *)
 
 module type RFA (RF : RF) = {
-  proc * main() : bool {RF.f}
+  proc main() : bool {RF.f}
 }.
 
 (* random function game:

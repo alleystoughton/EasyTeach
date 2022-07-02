@@ -6,7 +6,7 @@ require import AllCore Distr SmtMap DBool.
 require RedundantHashing.  (* abstract theory - can't import *)
 
 module type OR = {
-  proc * init(b_o : bool option) : unit
+  proc init(b_o : bool option) : unit
 
   proc get() : bool
 }.
@@ -29,7 +29,7 @@ module Or : OR = {
 }.
 
 module type ADV (O : OR) = {
-  proc * main() : bool {O.get}
+  proc main() : bool {O.get}
 }.
 
 module GEager (Adv : ADV) = {
@@ -94,7 +94,7 @@ byequiv => //.
 proc.
 inline*; wp.
 seq 3 4 :
-  (Or.b_opt{1} <> None /\
+  (={glob Adv} /\ Or.b_opt{1} <> None /\
    RH.NonOptHashing.mp{2}.[TheBool] = Some (oget Or.b_opt{1})).
 wp; sp.
 rcondt{2} 1; first auto; progress; by rewrite mem_empty.
@@ -119,7 +119,7 @@ proof.
 byequiv => //.
 proc.
 inline*; wp.
-seq 2 2 : (Or.b_opt{1} = None /\ RH.OptHashing.mp{2} = empty).
+seq 2 2 : (={glob Adv} /\ Or.b_opt{1} = None /\ RH.OptHashing.mp{2} = empty).
 auto.
 call
   (_ :

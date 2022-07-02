@@ -583,7 +583,7 @@ qed.
 local lemma G1_TRF_G2_main :
   equiv
   [G1(TRF).main ~ G2.main :
-   true ==>
+   ={glob Adv} ==>
    ={clash_pre}(EO_RF, EO_O) /\
    (! EO_RF.clash_pre{1} => ={res})].
 proof.
@@ -761,7 +761,7 @@ rewrite (RealOrder.ler_trans Pr[G2.main() @ &m : EO_O.clash_pre]);
   last 1 apply (G2_main_clash_ub &m).
 byequiv
   (_ :
-   true ==>
+   ={glob Adv} ==>
    (={clash_pre}(EO_RF, EO_O)) /\ (! EO_O.clash_pre{2} => ={res})) :
   (EO_RF.clash_pre) => //.
 by conseq G1_TRF_G2_main.
@@ -966,7 +966,7 @@ qed.
 local lemma G2_G3_main :
   equiv
   [G2.main ~ G3.main :
-   true ==>
+   ={glob Adv} ==>
    ={clash_post}(EO_O, EO_I) /\ (! EO_O.clash_post{1} => ={res})].
 proof.
 proc.
@@ -1077,7 +1077,7 @@ rewrite (RealOrder.ler_trans Pr[G3.main() @ &m : EO_I.clash_post]);
   last 1 apply (G3_main_clash_ub &m).
 byequiv
   (_ :
-   true ==>
+   ={glob Adv} ==>
    (={clash_post}(EO_O, EO_I)) /\ (! EO_I.clash_post{2} => ={res})) :
   (EO_O.clash_post) => //.
 by conseq G2_G3_main.

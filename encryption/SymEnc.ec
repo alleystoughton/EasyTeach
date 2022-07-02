@@ -67,7 +67,7 @@ module Cor (Enc : ENC) = {
 
 module type EO = {
   (* initialization *)
-  proc * init() : unit
+  proc init() : unit
 
   (* encryption of text by adversary before game's encryption *)
   proc enc_pre(x : text) : cipher
@@ -129,7 +129,7 @@ module EncO (Enc : ENC) : EO = {
 
 module type ADV (EO : EO) = {
   (* choose a pair of plaintexts, x1/x2 *)
-  proc * choose() : text * text {EO.enc_pre}
+  proc choose() : text * text {EO.enc_pre}
 
   (* given ciphertext c based on a random boolean b (the encryption
      using EO.genc of x1 if b = true, the encryption of x2 if b =
