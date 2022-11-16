@@ -51,10 +51,19 @@ qed.
 
 op dbits : bits distr.
 
-axiom dbits_ll : is_lossless dbits.
+(* the following two axioms tell us that the size of
+   bits is exactly 2 ^ n *)
+
+axiom dbits_ll : is_lossless dbits.  (* is a distribution *)
+
+(* every element x of bits has the same weight, 
+   1%r / (2 ^ n)%r *)
 
 axiom dbits1E (x : bits) :
   mu1 dbits x = 1%r / (2 ^ n)%r.
+
+(* so we can prove that dbits is full, i.e., every element
+   of the type has a non-zero weight *)
 
 lemma dbits_fu : is_full dbits.
 proof.
@@ -91,8 +100,7 @@ module GReal (Adv : ADV) = {
      assuming Adversary observes nothing when this happens
 
      of course, it's not realistic that a one-time pad can be
-     generated and secretly shared, but the parties still need to use
-     a one-time pad for secure communication *)
+     generated and shared with the adversary learning nothing *)
 
   proc gen() : unit = {
     pad <$ dbits;
@@ -149,9 +157,9 @@ module GIdeal(Sim : SIM, Adv : ADV) = {
    Adversary is completely unable to distinguish the real and ideal
    games:
 
-lemma Security (Adv <: ADV{GReal}) &m :
-  exists (Sim <: SIM{GReal}),  (* there is a simulator that can't read/write
-                                  GReal.pad *)
+lemma Security (Adv <: ADV{-GReal}) &m :
+  exists (Sim <: SIM{-GReal}),  (* there is a simulator that can't read/write
+                                   GReal.pad *)
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 *)
@@ -163,7 +171,7 @@ section.
 (* say Adv and GReal don't read/write each other's globals (GIdeal
    has no globals) *)
 
-declare module Adv : ADV{GReal}.
+declare module Adv <: ADV{-GReal}.
 
 (* define simulator as a local module, as security theorem won't
    depend upon it *)
@@ -178,13 +186,13 @@ local module Sim : SIM = {
 
 local lemma GReal_GIdeal :
   equiv[GReal(Adv).main ~ GIdeal(Sim, Adv).main :
-        true ==> ={res}].
+        ={glob Adv} ==> ={res}].
 proof.
 
 qed.
 
 lemma Sec &m :
-  exists (Sim <: SIM{GReal}),
+  exists (Sim <: SIM{-GReal}),
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 proof.
@@ -195,9 +203,9 @@ end section.
 
 (* security theorem *)
 
-lemma Security (Adv <: ADV{GReal}) &m :
-  exists (Sim <: SIM{GReal}),  (* there is a simulator that can't read/write
-                                  GReal.pad *)
+lemma Security (Adv <: ADV{-GReal}) &m :
+  exists (Sim <: SIM{-GReal}),  (* there is a simulator that can't read/write
+                                   GReal.pad *)
   Pr[GReal(Adv).main() @ &m : res] =
   Pr[GIdeal(Sim, Adv).main() @ &m : res].
 proof.

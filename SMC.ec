@@ -51,10 +51,19 @@ qed.
 
 op dbits : bits distr.
 
-axiom dbits_ll : is_lossless dbits.
+(* the following two axioms tell us that the size of
+   bits is exactly 2 ^ n *)
+
+axiom dbits_ll : is_lossless dbits.  (* is a distribution *)
+
+(* every element x of bits has the same weight, 
+   1%r / (2 ^ n)%r *)
 
 axiom dbits1E (x : bits) :
   mu1 dbits x = 1%r / (2 ^ n)%r.
+
+(* so we can prove that dbits is full, i.e., every element
+   of the type has a non-zero weight *)
 
 lemma dbits_fu : is_full dbits.
 proof.
@@ -91,8 +100,7 @@ module GReal (Adv : ADV) = {
      assuming Adversary observes nothing when this happens
 
      of course, it's not realistic that a one-time pad can be
-     generated and secretly shared, but the parties still need to use
-     a one-time pad for secure communication *)
+     generated and shared with the adversary learning nothing *)
 
   proc gen() : unit = {
     pad <$ dbits;

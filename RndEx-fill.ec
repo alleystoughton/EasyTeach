@@ -2,7 +2,15 @@
 
 prover [""].  (* no SMT solvers *)
 
-require import AllCore Bool Distr DBool.
+require import AllCore.
+require import Bool.   (* defines ^^ as exclusive or *)
+require import Distr.  (* (sub-)distributions *)
+(* lossless, full, uniform distribution {0,1} on bool
+
+   lossless means sum of the weights of type is 1%r
+   full means every element of type is in support (has non-0 probability)
+   uniform means all elements in support have same weight *)
+require import DBool.
 
 module M = {
   proc f() : bool = {
