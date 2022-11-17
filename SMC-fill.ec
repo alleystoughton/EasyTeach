@@ -123,8 +123,8 @@ module GReal (Adv : ADV) = {
     Adv.obs(y);        (* y is observed in transit between parties
                           by Adversary *)
     z <@ party(y);     (* y is decrypted by Party 2, yielding z *)
-    b <@ Adv.put(z);   (* z is given to Adversary by Party 2, which chooses
-                          boolean judgment *)
+    b <@ Adv.put(z);   (* z is given to Adversary by Party 2, and
+                          Adversary chooses boolean judgment *)
     return b;          (* return boolean judgment as game's result *)
   }    
 }.
