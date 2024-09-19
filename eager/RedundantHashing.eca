@@ -22,7 +22,7 @@ prover quorum=2 ["Alt-Ergo" "Z3"].  (* both Alt-Ergo and Z3 must succeed *)
 
 (***************************** Standard Theories ******************************)
 
-require import AllCore Distr FSet SmtMap List.
+require import AllCore Distr FSet FMap List.
 require IterProc.
 
 (***************************** Auxiliary Theories *****************************)

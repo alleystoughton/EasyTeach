@@ -18,7 +18,7 @@ check() {
   fi;
 }
 
-check SmtMapAux.ec
+check FMapAux.ec
 check PseudoRandFun.ec
 check SymEnc.ec
 check SymEnc-PRF.ec

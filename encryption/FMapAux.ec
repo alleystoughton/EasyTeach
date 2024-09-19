@@ -1,6 +1,6 @@
-(* SmtMapAux.ec *)
+(* FMapAux.ec *)
 
-require import AllCore SmtMap.
+require import AllCore FMap.
 
 lemma eq_except_pred_set
       (X : 'a -> bool) (x : 'a) (y y' : 'b) (m1 m2 : ('a, 'b) fmap) :

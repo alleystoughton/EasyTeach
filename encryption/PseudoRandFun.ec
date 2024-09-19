@@ -4,7 +4,7 @@
 
 prover [""].  (* no SMT solvers *)
 
-require import AllCore Distr DBool FSet SmtMap.
+require import AllCore Distr DBool FSet FMap.
 
 (* theory parameters *)
 

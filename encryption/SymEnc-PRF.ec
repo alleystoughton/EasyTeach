@@ -6,11 +6,11 @@
 
 prover [""].  (* no SMT solvers *)
 
-require import AllCore Distr DBool List SmtMap FSet Mu_mem.
+require import AllCore Distr DBool List FMap FSet Mu_mem.
 require import StdBigop. import Bigreal BRA.
 require import StdOrder. import RealOrder.
 require import StdRing. import RField.
-require import SmtMapAux.
+require import FMapAux.
 require BitWord FelTactic.
 
 (* require but don't import theories for symmetric encryption and

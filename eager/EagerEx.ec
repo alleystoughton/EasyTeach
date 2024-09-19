@@ -2,7 +2,7 @@
 
 prover [""].
 
-require import AllCore Distr SmtMap DBool.
+require import AllCore Distr FMap DBool.
 require RedundantHashing.  (* abstract theory - can't import *)
 
 module type OR = {
