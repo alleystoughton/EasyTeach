@@ -192,7 +192,7 @@ qed.
    note that it doesn't interact with any other module (except though
    its Adv and RF parameters) *)
 
-module Adv2RFA(Adv : ADV, RF : RF) = {
+module (Adv2RFA (Adv : ADV) : RFA) (RF : RF) = {
   module EO : EO = {  (* uses RF.f *)
     var ctr_pre : int
     var ctr_post : int
