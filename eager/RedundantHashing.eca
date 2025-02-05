@@ -468,7 +468,7 @@ proc; inline*; sp.
 while (mem l inp' \/ dom NOH'.mp inp').
 auto; progress;
   rewrite -mem_fdom fdom_set in_fsetU1; smt(mem_fdom mem_ne_list_drop1).
-auto => />.
+auto => /> &hr.
 rewrite memE /#.
 qed.
 

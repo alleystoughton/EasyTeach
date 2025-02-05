@@ -206,7 +206,7 @@ by rewrite -xorA xor_double_same_left.
 call (_ : true).  (* last statement of each program must be call *)
 wp.
 call (_ : true).
-auto => />.
+auto => /> &1 &2.
 by rewrite xor_double_same_right.
 qed.
 
