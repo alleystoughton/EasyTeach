@@ -35,7 +35,7 @@ check() {
 check FMapAux.ec
 check PseudoRandFun.ec
 check SymEnc.ec
-check SymEnc-PRF.ec
+check SymEncPRF.ec
 
 # success!
 

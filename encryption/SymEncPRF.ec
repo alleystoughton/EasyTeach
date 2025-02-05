@@ -1,4 +1,4 @@
-(* SymEnc-PRF.ec *)
+(* SymEncPRF.ec *)
 
 (* IND-CPA (indistinguishability under chosen plaintext attack)
    security for symmetric encryption built out of pseudorandom

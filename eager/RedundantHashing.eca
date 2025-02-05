@@ -569,7 +569,6 @@ proc; inline NOH'.rehash_red_inps; wp 1 3.
 conseq (_ : _ ==> ={NOH'.mp}) => //.
 transitivity*{2}
   { Iter(NOH'.I).iters(elems NOH'.red_inps, [inp]); } => //.
-progress; by exists NOH'.mp{2} NOH'.red_inps{2} inp{2} out{2}.
 symmetry.
 call (iters_perm NOH'.I iter_perm2).
 auto; progress.
