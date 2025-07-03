@@ -12,3 +12,6 @@ tactic. (It uses the auxiliary theories [`FSetAux.ec`](FSetAux.ec) and
 
 And [`EagerEx.ec`](EagerEx.ec) is proved using 
 [`RedundantHashing.eca`](RedundantHashing.eca).
+
+See `crypto/PROM.ec` of the EasyCrypt standard library for an extended
+- and more complex - eager/lazy random sampling theory.

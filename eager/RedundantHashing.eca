@@ -146,42 +146,12 @@ section.
 
 declare module HashAdv <: HASHING_ADV{-NonOptHashing, -OptHashing}.
 
-(* extended hashing module interface
-
-   implementations include two global variables: the oracle's map,
-   plus a record of which inputs are *redundant* - i.e., have been
-   supplied to rhash but not to hash
+(* extended hashing modules include two global variables: the oracle's
+   map, plus a record of which inputs are *redundant* - i.e., have
+   been supplied to rhash but not to hash
 
    some of the details of the two implementations that follow can be
    best understood by reading the subsequent proofs *)
-
-module type HASHING' = {
-  (* initialization *)
-
-  proc init() : unit
-
-  (* ordinary hashing *)
-
-  proc hash(inp : input) : output
-
-  (* redundant hashing - result ignored *)
-
-  proc rhash(inp : input) : unit
-
-  (* rehash redundant inputs *)
-
-  proc rehash_red_inps() : unit
-
-  (* rehash redundant inputs, and then look up value of inp *)
-
-  proc rehash_red_inps_rslt(inp : input) : output
-
-  (* hash inp either before or after (depending on the implementation)
-     rehashing redundant inputs, returning value of inp (obtained
-     immediately after hashing it) *)
-
-  proc rehash_red_inps_addl(inp : input) : output
-}.
 
 (* so we can use iteration over inputs *)
 
@@ -191,7 +161,22 @@ proof *.
 
 (* non-optimized implementation *)
 
-local module NOH' : HASHING, HASHING' = {
+module type NOH'_extra = {
+  (* rehash redundant inputs *)
+
+  proc rehash_red_inps() : unit
+
+  (* rehash redundant inputs, and then look up value of inp *)
+
+  proc rehash_red_inps_rslt(inp : input) : output
+
+  (* rehash inp after rehashing redundant inputs, returning value of
+     inp *)
+
+  proc rehash_red_inps_addl(inp : input) : output
+}.
+
+local module NOH' : HASHING, NOH'_extra = {
   var mp : (input, output) fmap
   var red_inps : input fset
 
@@ -253,7 +238,18 @@ local module NOH' : HASHING, HASHING' = {
 
 (* optimized implementation *)
 
-local module OH' : HASHING, HASHING' = {
+module type OH'_extra = {
+  (* rehash redundant inputs *)
+
+  proc rehash_red_inps() : unit
+
+  (* rehash inp before rehashing redundant inputs, returning
+     value of inp (obtained immediately after hashing it) *)
+
+  proc rehash_red_inps_addl(inp : input) : output
+}.
+
+local module OH' : HASHING, OH'_extra = {
   var mp : (input, output) fmap
   var red_inps : input fset
 
@@ -294,13 +290,6 @@ local module OH' : HASHING, HASHING' = {
     Iter(I).iter(elems red_inps);
   }
 
-  proc rehash_red_inps_rslt(inp : input) : output = {
-    var out : output;
-    rehash_red_inps();
-    out <- oget mp.[inp];
-    return out;
-  }
-
   proc rehash_red_inps_addl(inp : input) : output = {
     var out : output;
     out <$ doutput;  (* before *)
@@ -336,7 +325,7 @@ trivial.
 qed.
 
 (* games based on the two extended hashing implementations,
-   where adversay only gets access to hash and rhash *)
+   where adversary only gets access to hash and rhash *)
 
 local module GNOH' = {
   module HA = HashAdv(NOH')
@@ -487,11 +476,10 @@ auto; progress;
 auto; smt(memE).
 qed.
 
-local lemma NOH'_rehash_red_inps_not_red_dom (inp' : input) :
+local lemma NOH'_rehash_red_inps_pres_dom (inp' : input) :
   hoare
   [NOH'.rehash_red_inps :
-   ! mem NOH'.red_inps inp' /\ dom NOH'.mp inp' ==>
-   dom NOH'.mp inp'].
+   dom NOH'.mp inp' ==> dom NOH'.mp inp'].
 proof.
 proc; inline*; sp.
 while (dom NOH'.mp inp').
@@ -500,18 +488,18 @@ rewrite -mem_fdom fdom_set in_fsetU1 mem_fdom /#.
 auto.
 qed.
 
-local lemma NOH'_OH'_rehash_red_inps_indep_pres
+local lemma NOH'_OH'_rehash_red_inps_not_red_pres
             (inp : input, out : output) :
   equiv
   [NOH'.rehash_red_inps ~ OH'.rehash_red_inps :
    ={mp, red_inps}(NOH', OH') /\ ! mem NOH'.red_inps{1} inp /\
-   oget NOH'.mp{1}.[inp] = out ==>
-   NOH'.mp{1} = OH'.mp{2} /\ oget NOH'.mp{1}.[inp] = out].
+   NOH'.mp{1}.[inp] = Some out ==>
+   NOH'.mp{1} = OH'.mp{2} /\ NOH'.mp{1}.[inp] = Some out].
 proof.
 proc; inline*; sp.
 while
   (={l} /\ NOH'.mp{1} = OH'.mp{2} /\
-   ! mem l{1} inp /\ oget NOH'.mp{1}.[inp] = out).
+   ! mem l{1} inp /\ NOH'.mp{1}.[inp] = Some out).
 auto; progress; [smt(mem_drop) | smt(mem_ne_list_drop1 get_setE)].
 auto; smt(memE).
 qed.
@@ -678,11 +666,14 @@ inline OH'.rehash_red_inps_addl; sim.
 (* second subcase: mem (dom NOH'.mp{1}) inp{1} *)
 rcondf{2} 1; first auto; smt().
 rcondf{1} 2;
-  first auto; call (NOH'_rehash_red_inps_not_red_dom inp{m}); auto.
+  first auto; call (NOH'_rehash_red_inps_pres_dom inp{m}); auto.
 wp; sp.
 exists* inp{1}; elim* => inp'. exists* result{2}; elim* => out'.
-call (NOH'_OH'_rehash_red_inps_indep_pres inp' out').
-auto; progress; by rewrite minus1_not_mem.
+call (NOH'_OH'_rehash_red_inps_not_red_pres inp' out').
+auto; progress.
+rewrite some_oget 1:-domE //.
+by rewrite H3 oget_some.
+by rewrite minus1_not_mem.
 qed.
 
 local lemma eager_rhash :
@@ -706,7 +697,7 @@ call{1} (NOH'_rehash_red_inps_red_dom inp{m}); auto.
 sim.
 case (dom NOH'.mp{1} inp{1}).
 rcondf{2} 1; first auto. rcondf{1} 2; auto.
-call (NOH'_rehash_red_inps_not_red_dom inp{m}); auto.
+call (NOH'_rehash_red_inps_pres_dom inp{m}); auto.
 sim.
 rcondt{2} 1; first auto. rcondt{1} 2; first auto.
 call (NOH'_rehash_red_inps_not_red_not_dom inp{m}); auto.
