@@ -26,7 +26,8 @@ op key_len : {int | 0 < key_len} as gt0_key_len.
 
 clone BitWord as Key with
   op n <- key_len
-proof gt0_n by apply gt0_key_len.
+proof *.
+realize gt0_n. by apply gt0_key_len. qed.
 
 type key = Key.word.
 
@@ -51,7 +52,8 @@ op text_len : {int | 0 < text_len} as gt0_text_len.
 
 clone BitWord as Text with
   op n <- text_len
-proof gt0_n by apply gt0_text_len.
+proof *.
+realize gt0_n. by apply gt0_text_len. qed.
 
 type text = Text.word.
 
