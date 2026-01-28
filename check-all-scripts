@@ -47,6 +47,12 @@ echo ""
 
 ./check-all-scripts
 
+if [ $? -ne 0 ];
+then echo "";
+     echo exiting;
+     exit 1;
+fi;
+
 echo cd to ..
 cd ..
 
@@ -55,6 +61,12 @@ echo cd to eager
 echo ""
 
 ./check-all-scripts
+
+if [ $? -ne 0 ];
+then echo "";
+     echo exiting;
+     exit 1;
+fi;
 
 echo cd to ..
 cd ..
