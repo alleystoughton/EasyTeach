@@ -700,9 +700,12 @@ wp; simplify.
 conseq (_ : _ ==> u \in fdom TRF.mp).
 move => /> &hr le_card_dom_mp_limit _ u0.
 by rewrite mem_fdom.
-rnd; simplify; skip; progress.
-by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0 1:le_fromint
-         1:StdOrder.IntOrder.expr_ge0 1:ltzW // le_fromint.
+rnd; simplify.
+skip; progress;
+  by rewrite mu_dtext_mem ler_wpmul2r 1:invr_ge0 1:le_fromint
+             1:StdOrder.IntOrder.expr_ge0 1:ltzW // le_fromint.
+rewrite divr_ge0 1:le_fromint 1:ge0_limit_pre.
+by rewrite le_fromint StdOrder.IntOrder.expr_ge0.
 auto; progress; by rewrite dtext_ll.
 hoare; inline*; auto; progress.
 trivial.
@@ -1050,9 +1053,10 @@ seq 2 :
   (0%r).
 auto.
 wp.
-rnd (pred1 EO_I.genc_inp).
+rnd (pred1 EO_I.genc_inp); simplify.
 auto => /> &hr ctr_post.
 by rewrite mu1_dtext.
+by rewrite invr_ge0 le_fromint StdOrder.IntOrder.expr_ge0.
 auto.
 hoare; inline*; wp; sp; if; auto.
 trivial.
